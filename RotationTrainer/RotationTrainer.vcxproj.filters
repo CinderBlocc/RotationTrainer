@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{cbb74636-0855-49e4-aec0-76bfc04651f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\Checkpoints">
+      <UniqueIdentifier>{1bb4cd90-944f-4440-820b-55d64f7d43a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\Sequences">
+      <UniqueIdentifier>{aa314238-a3d7-41a8-ab94-65d915bb777f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin">
+      <UniqueIdentifier>{fb934eca-f014-4e51-95c5-e0d281e72094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Headers">
+      <UniqueIdentifier>{514c8aff-8ef6-408c-8d8e-33336001eb36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Source Files">
+      <UniqueIdentifier>{fa712a51-f99b-4e26-badd-1e41ebd4bd6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{fc98cacc-ec0b-489c-97b4-42df0b78471c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\RenderingTools">
+      <UniqueIdentifier>{a6fe2f1b-459e-4ad8-b46b-25084b839d6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\RenderingTools\Objects">
+      <UniqueIdentifier>{43b80c3b-8c92-4729-aaa4-89d9dc1fdf64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\RenderingTools\Extra">
+      <UniqueIdentifier>{1c283c0f-6b56-4bad-b4a8-d543ca02d573}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\BackboardCheckpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\BallCheckpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\BoostCheckpoints.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\Checkpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\PostCheckpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugin\CheckpointsList.cpp">
+      <Filter>Plugin\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugin\RotationTrainer.cpp">
+      <Filter>Plugin\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugin\SettingsFileGenerator.cpp">
+      <Filter>Plugin\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\SequenceManager.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\NestedSequence.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\IndividualSequence.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\Sequence.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\PendingNestedSequence.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\RenderingTools.h">
+      <Filter>Libraries\RenderingTools</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\BackboardCheckpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\BallCheckpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\BoostCheckpoints.h">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\Checkpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\PostCheckpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugin\RotationTrainer.h">
+      <Filter>Plugin\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugin\MacrosStructsEnums.h">
+      <Filter>Plugin\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\SequenceManager.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\NestedSequence.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\IndividualSequence.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\Sequence.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\PendingNestedSequence.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\SequenceProperties.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

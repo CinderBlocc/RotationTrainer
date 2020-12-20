@@ -1,0 +1,116 @@
+#pragma once
+#include "bakkesmod/wrappers/wrapperstructs.h"
+#include <vector>
+#include <memory>
+
+// MACROS //
+#define CVAR_ENABLED               "Rotation_Enabled"
+#define CVAR_RENDER_TYPE           "Rotation_RenderType"
+#define CVAR_SEQUENCE_NAME         "Rotation_SequenceName"
+#define NOTIFIER_REBUILD_UI        "Rotation_RebuildUI"
+#define NOTIFIER_SEQUENCE_LOADALL  "Rotation_LoadAllSequences"
+#define NOTIFIER_SEQUENCE_START    "Rotation_StartSequence"
+#define NOTIFIER_SEQUENCE_END      "Rotation_EndSequence"
+#define NOTIFIER_SEQUENCE_PREVIOUS "Rotation_PreviousSequence"
+#define NOTIFIER_SEQUENCE_NEXT     "Rotation_NextSequence"
+#define NOTIFIER_GET_START_INFO    "Rotation_GetStartPointInfo"
+
+#define DEFAULT_CONFIG_DIRECTORY   "./bakkesmod/data/RotationTrainer/Sequences/"
+
+
+// ENUMS //
+enum class EAnimationDirection
+{
+	ANIM_DEFAULT = 0,
+	ANIM_CW,
+	ANIM_CCW,
+	ANIM_MAX
+};
+
+enum class ELocationType
+{
+	LT_DEFAULT = 0,
+	LT_LARGE_BOOST,
+	LT_SMALL_BOOST,
+	LT_BACKBOARD,
+	LT_POST,
+	LT_BALL,
+	LT_MAX
+};
+
+enum class ELocation
+{
+	LOC_DEFAULT = 0,
+	
+	//Large Boosts
+	LOC_LBOOST_BACK_LEFT,
+	LOC_LBOOST_BACK_RIGHT,
+	LOC_LBOOST_MIDFIELD_LEFT,
+	LOC_LBOOST_MIDFIELD_RIGHT,
+	LOC_LBOOST_FRONT_LEFT,
+	LOC_LBOOST_FRONT_RIGHT,
+	
+	//Small Boosts
+	LOC_SBOOST_BACK_GOALLINE_LEFT,
+	LOC_SBOOST_BACK_GOALLINE_CENTER,
+	LOC_SBOOST_BACK_GOALLINE_RIGHT,
+	LOC_SBOOST_BACK_GOALBOX_LEFT,
+	LOC_SBOOST_BACK_GOALBOX_CENTER,
+	LOC_SBOOST_BACK_GOALBOX_RIGHT,
+	LOC_SBOOST_BACK_MIDDLE_FAR_LEFT,
+	LOC_SBOOST_BACK_MIDDLE_CENTER_LEFT,
+	LOC_SBOOST_BACK_MIDDLE_CENTER_RIGHT,
+	LOC_SBOOST_BACK_MIDDLE_FAR_RIGHT,
+	LOC_SBOOST_BACK_MIDFIELD_LEFT,
+	LOC_SBOOST_BACK_MIDFIELD_CENTER,
+	LOC_SBOOST_BACK_MIDFIELD_RIGHT,
+	LOC_SBOOST_MIDFIELD_LEFT,
+	LOC_SBOOST_MIDFIELD_RIGHT,
+	LOC_SBOOST_FRONT_MIDFIELD_RIGHT,
+	LOC_SBOOST_FRONT_MIDFIELD_CENTER,
+	LOC_SBOOST_FRONT_MIDFIELD_LEFT,
+	LOC_SBOOST_FRONT_MIDDLE_FAR_RIGHT,
+	LOC_SBOOST_FRONT_MIDDLE_CENTER_RIGHT,
+	LOC_SBOOST_FRONT_MIDDLE_CENTER_LEFT,
+	LOC_SBOOST_FRONT_MIDDLE_FAR_LEFT,
+	LOC_SBOOST_FRONT_GOALBOX_RIGHT,
+	LOC_SBOOST_FRONT_GOALBOX_CENTER,
+	LOC_SBOOST_FRONT_GOALBOX_LEFT,
+	LOC_SBOOST_FRONT_GOALLINE_RIGHT,
+	LOC_SBOOST_FRONT_GOALLINE_CENTER,
+	LOC_SBOOST_FRONT_GOALLINE_LEFT,
+
+	//Backboard
+	LOC_BACKBOARD_LEFT,
+	LOC_BACKBOARD_RIGHT,
+
+	//Post
+	LOC_POST_LEFT,
+	LOC_POST_RIGHT,
+
+	//Ball
+	LOC_BALL,
+
+	LOC_MAX
+};
+
+enum class ELoadSequenceError
+{
+    SEQERR_ISALREADYSEQUENCELIST = 0,
+    SEQERR_ISALREADYCHECKPOINTSLIST
+};
+
+
+// STRUCTS //
+struct CarLocations
+{
+	Vector LastLocation;
+	Vector CurrentLocation;
+	SteamID PlayerID;
+	bool bHasNowAndLast = false; //don't check the current minus last location on the first tick that the object exists
+};
+
+struct LoadedSequence
+{
+	std::vector<std::shared_ptr<class Checkpoint>> checkpoints;
+};

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{55FE0D1C-19C3-43BE-B6A3-302E002C8186}</ProjectGuid>
+    <RootNamespace>Gregan</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>RotationTrainer</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(BAKKESMODSDK)include;F:\_YouTube\04_Extra_Assets\Game_Extensions_for_Production\_UP-TO-DATE-HELPER-FILES\RenderingTools;$(ProjectDir)Classes;$(ProjectDir)Plugin</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(BAKKESMODSDK)lib</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>"$(BAKKESMODSDK)\bakkesmod-patch.exe" "$(TargetPath)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.cpp" />
+    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.cpp" />
+    <ClCompile Include="Classes\Checkpoints\BackboardCheckpoint.cpp" />
+    <ClCompile Include="Classes\Checkpoints\BallCheckpoint.cpp" />
+    <ClCompile Include="Classes\Checkpoints\BoostCheckpoints.cpp" />
+    <ClCompile Include="Classes\Checkpoints\Checkpoint.cpp" />
+    <ClCompile Include="Classes\Checkpoints\PostCheckpoint.cpp" />
+    <ClCompile Include="Classes\Sequences\NestedSequence.cpp" />
+    <ClCompile Include="Classes\Sequences\IndividualSequence.cpp" />
+    <ClCompile Include="Classes\Sequences\PendingNestedSequence.cpp" />
+    <ClCompile Include="Classes\Sequences\Sequence.cpp" />
+    <ClCompile Include="Classes\Sequences\SequenceManager.cpp" />
+    <ClCompile Include="Plugin\CheckpointsList.cpp" />
+    <ClCompile Include="Plugin\RotationTrainer.cpp" />
+    <ClCompile Include="Plugin\SettingsFileGenerator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\RenderingTools.h" />
+    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.h" />
+    <ClInclude Include="Classes\Checkpoints\BackboardCheckpoint.h" />
+    <ClInclude Include="Classes\Checkpoints\BallCheckpoint.h" />
+    <ClInclude Include="Classes\Checkpoints\BoostCheckpoints.h" />
+    <ClInclude Include="Classes\Checkpoints\Checkpoint.h" />
+    <ClInclude Include="Classes\Checkpoints\PostCheckpoint.h" />
+    <ClInclude Include="Classes\Sequences\NestedSequence.h" />
+    <ClInclude Include="Classes\Sequences\IndividualSequence.h" />
+    <ClInclude Include="Classes\Sequences\PendingNestedSequence.h" />
+    <ClInclude Include="Classes\Sequences\Sequence.h" />
+    <ClInclude Include="Classes\Sequences\SequenceManager.h" />
+    <ClInclude Include="Classes\Sequences\SequenceProperties.h" />
+    <ClInclude Include="Plugin\RotationTrainer.h" />
+    <ClInclude Include="Plugin\MacrosStructsEnums.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
