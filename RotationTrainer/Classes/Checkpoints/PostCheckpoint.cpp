@@ -3,7 +3,7 @@
 
 //CONSTRUCTORS
 PostCheckpoint::PostCheckpoint(Vector InNearCorner, Vector InFarCorner, EAnimationDirection InAnimDir, std::string InCode, ELocation InLocation, std::string InName)
-    : Checkpoint(ELocationType::LT_POST, InLocation, 0, InCode, InName),
+    : Checkpoint(ELocationType::LT_POST, InLocation, InCode, InName),
       NearCorner(InNearCorner), FarCorner(InFarCorner), AnimationDirection(InAnimDir) {}
 
 //DRAW

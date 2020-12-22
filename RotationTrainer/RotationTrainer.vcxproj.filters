@@ -123,6 +123,9 @@
     <ClCompile Include="Classes\Sequences\PendingNestedSequence.cpp">
       <Filter>Classes\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\LocationCheckpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h">
@@ -217,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="Classes\Sequences\SequenceProperties.h">
       <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\LocationCheckpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

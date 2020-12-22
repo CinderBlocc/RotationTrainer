@@ -14,61 +14,35 @@ using namespace std::chrono;
 BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "0.9.0", PLUGINTYPE_CUSTOM_TRAINING)
 
 /*
-    THE PLAN:
-        - file:///F:/_YouTube/04_Extra_Assets/bakkesmod_extra/Custom_workshop_map.pdf
-*/
-
-/*
-
     TO-DO
 
     - ADD SEQUENCE OF SEQUENCES: Just like a normal sequence.cfg, but it's a list of other sequences that will run once one sequence has ended and the player hits reset
         - Really close to finishing this one, just re-read through everything until it makes sense and add the last bits
         - Might want to pull the sequence list reading out of the LoadSequence function and bring it into StartSequence
+    
     - Move sequence properties into the LoadedSequence struct so you can properly set properties when that sequence is called from the list of sequences
+    
     - ADD PERSONAL BEST LIST
         - Store (in a single file) a list of the local player's current bests for any sequence they've completed
         - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
-    - When getting all car locations, dont continue to store the previous location if the car doesn't exist anymore
-        - First of all, dont ever delete cars from the vector unless youre starting a new sequence
-        - If any of the IDs of the locations structs within the vector isn't currently on the field, nullify its values
-    - Will need GUID so host can indicate whether checkpoints have been cleared by other cars or not. Clients can't get car location
-    - Add an "invert sequence" checkbox
-*/
-
-/*
-    LIST FROM GREGAN:
     
-    [Y] = yes I can do that
-    [N] = no I can't do that
-    [*] = maybe I can do that
-    [++++] = done
+    - Pressing start doesn't stop timer (not sure if this is needed).
+        - Use GameWrapper::IsPaused(). Would only work in freeplay or when a LAN host uses the admin pause feature
+    
+    - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
+        - ADD A 1 SECOND PENALTY PER SKIP. When sorting personal bests, it'll be much easier to track when an objective time change is in place
+            - Indicate a penalty will be added by displaying a red "+9s" below the clock. Add that to the time after the sequence is done
+    
+    - Set maximum boost cap to encourage flips to navigate the field. Make it a property ranging 0 - 100
+        - Partially implemented. It is an available property, but it doesn't actually set anything yet
 
-    [++++] Timer reset with Reset shot.
-    [Y] Timer start when moving like how it does in Custom training. Could be a toggleable option in the set maker to start timer on movement or on first checkpoint.
-    [N] After completing a set, show boost usage.
-        -- Tracking boost usage is messy, even for just one player. That messiness is multiplied by the number of players.
-    [++++] 'Get car info' button in F2 menu to add to clipboard for easy copy and paste.
-    [++++] The ball can be hit/moved before it is a target. Might be interesting with have it not hittable until it's 3rd target (red).
-        -- I've set it to only move when it's the current target
-    [Y] Pressing start doesn't stop timer (not sure if this is needed).
-        -- Need to wait for GameWrapper::IsPaused() to be added [**IT'S ADDED**]. Would only work in freeplay or *maybe* when a LAN host uses the admin pause feature
-    [Y] If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
-        - When doing boost lines it is more useful to carry on and acknowledge 1 was missed than otherwise.
-        -- ADD A 3 SECOND PENALTY PER SKIP. When sorting personal bests, it'll be much easier to track when an objective time change is in place
-            -- Indicate a penalty will be added by displaying a red "+9s" below the clock. Add that to the time after the sequence is done
-    [++++] Make it possible for the final location to be something other than the ball
-        - [N] Likewise, make it possible for the ball to be in the middle of the sequence.
-            -- Too complicated: Goal replay breaks flow, and certain functions are tied to the ball being scored that would break sequence
-    [Y] Set maximum boost cap to encourage flips to navigate the field. Make it a property ranging 0 - 100
-        -- Partially implemented. It is an available property, but it doesn't actually set anything yet
-
-    [*] Have a demoable car in opponents net as a location to hit.
-    [*] Have a location which sets boost so it can take away your boost.
-    [*] Have more locations players can go.
-        -- Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
-            -- i.e. CUSTOM <X> <Y> <Z> <optional radius> <optional boost clamp value>
-            -- Add boost clamp value option to all checkpoints in file? Would just need to parse next string element after a space and check if its a digit 0 <= X <= 100
+    - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
+    
+    - Have a location which sets boost so it can take away your boost. Use LocationType::LT_BOOST_SETTER - BoostSetter is an extension of CustomLocation
+    
+    - Have more locations players can go. Use LocationType::LT_CUSTOM_LOCATION
+        - Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
+            - Formatting: LOCATION(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
 */
 
 void RotationTrainer::onLoad()
@@ -305,7 +279,7 @@ void RotationTrainer::Render(CanvasWrapper canvas)
     if(localCar.IsNull()) return;
     PriWrapper PRI = localCar.GetPRI();
     if(PRI.IsNull()) return;
-    localCarLocations.PlayerID = PRI.GetUniqueId();
+    localCarLocations.PlayerID = PRI.GetUniqueIdWrapper();
     localCarLocations.LastLocation = localCarLocations.CurrentLocation;
     localCarLocations.CurrentLocation = localCar.GetLocation();
 

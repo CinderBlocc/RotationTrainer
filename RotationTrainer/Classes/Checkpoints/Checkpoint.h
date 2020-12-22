@@ -12,7 +12,7 @@ class Checkpoint
 {
 public:
     Checkpoint();//Need to keep default constructor for indirect derived classes
-	Checkpoint(ELocationType InLocationType, ELocation InLocation, float InAdditionalTime, std::string InCode, std::string InName);
+	Checkpoint(ELocationType InLocationType, ELocation InLocation, std::string InCode, std::string InName);
 
     virtual void Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, class RT::Frustum InFrustum, float InSeconds);
     virtual bool CheckCollision(CarWrapper InCar, CarLocations InCarLocations);
@@ -23,7 +23,6 @@ public:
 protected:
     ELocationType LocationType;
 	ELocation Location;
-	float AdditionalTime;
 	std::string Code;
 	std::string Name;
 };

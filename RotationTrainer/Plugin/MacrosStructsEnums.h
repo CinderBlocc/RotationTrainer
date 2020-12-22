@@ -35,6 +35,9 @@ enum class ELocationType
 	LT_BACKBOARD,
 	LT_POST,
 	LT_BALL,
+    LT_DEMO_CAR,
+    LT_CUSTOM_LOCATION,
+    LT_BOOST_SETTER,
 	LT_MAX
 };
 
@@ -106,7 +109,7 @@ struct CarLocations
 {
 	Vector LastLocation;
 	Vector CurrentLocation;
-	SteamID PlayerID;
+	UniqueIDWrapper PlayerID;
 	bool bHasNowAndLast = false; //don't check the current minus last location on the first tick that the object exists
 };
 

@@ -3,7 +3,7 @@
 
 //CONSTRUCTOR
 BallCheckpoint::BallCheckpoint(std::string InName)
-    : Checkpoint(ELocationType::LT_BALL, ELocation::LOC_BALL, 0, InName, InName), Radius(92.75) {}
+    : Checkpoint(ELocationType::LT_BALL, ELocation::LOC_BALL, InName, InName), Radius(92.75) {}
 
 //DRAW
 void BallCheckpoint::Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, RT::Frustum InFrustum, float InSeconds)

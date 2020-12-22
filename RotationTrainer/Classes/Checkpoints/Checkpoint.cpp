@@ -2,10 +2,10 @@
 #include "RenderingTools.h"
 
 Checkpoint::Checkpoint()
-    : LocationType(ELocationType::LT_DEFAULT), Location(ELocation::LOC_DEFAULT), AdditionalTime(0), Code("CheckpointCodeDefault"), Name("CheckpointNameDefault") {}
+    : LocationType(ELocationType::LT_DEFAULT), Location(ELocation::LOC_DEFAULT), Code("CheckpointCodeDefault"), Name("CheckpointNameDefault") {}
 
-Checkpoint::Checkpoint(ELocationType InLocationType, ELocation InLocation, float InAdditionalTime, std::string InCode, std::string InName)
-	: LocationType(InLocationType), Location(InLocation), AdditionalTime(InAdditionalTime), Code(InCode), Name(InName) {}
+Checkpoint::Checkpoint(ELocationType InLocationType, ELocation InLocation, std::string InCode, std::string InName)
+	: LocationType(InLocationType), Location(InLocation), Code(InCode), Name(InName) {}
 
 void Checkpoint::Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, class RT::Frustum InFrustum, float InSeconds)
 {

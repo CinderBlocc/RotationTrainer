@@ -3,7 +3,7 @@
 
 //CONSTRUCTORS
 BackboardCheckpoint::BackboardCheckpoint(Vector InGoalCorner, Vector InFarCorner, EAnimationDirection InAnimDir, std::string InCode, ELocation InLocation, std::string InName)
-    : Checkpoint(ELocationType::LT_BACKBOARD, InLocation, 0, InCode, InName), GoalCorner(InGoalCorner), FarCorner(InFarCorner), AnimationDirection(InAnimDir) {}
+    : Checkpoint(ELocationType::LT_BACKBOARD, InLocation, InCode, InName), GoalCorner(InGoalCorner), FarCorner(InFarCorner), AnimationDirection(InAnimDir) {}
 
 //DRAW
 void BackboardCheckpoint::Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, RT::Frustum InFrustum, float InSeconds)
