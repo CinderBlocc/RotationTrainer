@@ -1,5 +1,7 @@
 #pragma once
+#include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/wrappers/wrapperstructs.h"
+#include "bakkesmod/wrappers/UniqueIDWrapper.h"
 #include <vector>
 #include <memory>
 
@@ -15,7 +17,7 @@
 #define NOTIFIER_SEQUENCE_NEXT     "Rotation_NextSequence"
 #define NOTIFIER_GET_START_INFO    "Rotation_GetStartPointInfo"
 
-#define DEFAULT_CONFIG_DIRECTORY   "./bakkesmod/data/RotationTrainer/Sequences/"
+#define DEFAULT_CONFIG_DIRECTORY   gameWrapper->GetDataFolder() / "RotationTrainer" / "Sequences"
 
 
 // ENUMS //

@@ -13,7 +13,7 @@
 SequenceManager::SequenceManager(std::vector<std::shared_ptr<Checkpoint>>* InCheckpoints) : AllCheckpoints(InCheckpoints) {}
 
 
-void SequenceManager::LoadAllSequences(std::string InDirectory)
+void SequenceManager::LoadAllSequences(std::filesystem::path InDirectory)
 {
     //Clean out the current sequences
     AllSequences.clear();
@@ -25,7 +25,7 @@ void SequenceManager::LoadAllSequences(std::string InDirectory)
     //If it is a nested sequence, create a pending request
     for(const auto& SequenceFileName : AllSequenceFileNames)
     {
-        std::ifstream InFile = std::ifstream(InDirectory + SequenceFileName + ".cfg");
+        std::ifstream InFile = std::ifstream(InDirectory / std::string(SequenceFileName + ".cfg"));
         bool bIsNestedSequence = false;
 
         //Get the sequence properties
@@ -60,7 +60,7 @@ const std::vector<std::string>& SequenceManager::GetSequenceFilenames()
     return AllSequenceFileNames;
 }
 
-void SequenceManager::GetAllSequenceFiles(std::string InDirectory)
+void SequenceManager::GetAllSequenceFiles(std::filesystem::path InDirectory)
 {
     //Loop through every file in the sequences folder, and store the filenames of the ones that are to be used
     

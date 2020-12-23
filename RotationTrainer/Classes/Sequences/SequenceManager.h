@@ -16,7 +16,7 @@ class SequenceManager
 public:
     SequenceManager(std::vector<std::shared_ptr<Checkpoint>>* InCheckpoints);
 
-    void LoadAllSequences(std::string InDirectory);
+    void LoadAllSequences(std::filesystem::path InDirectory);
     const std::vector<std::string>& GetSequenceFilenames();
 
 private:
@@ -28,7 +28,7 @@ private:
 
     std::vector<std::shared_ptr<Checkpoint>>* AllCheckpoints;
 
-    void GetAllSequenceFiles(std::string InDirectory);
+    void GetAllSequenceFiles(std::filesystem::path InDirectory);
     SequenceProperties GetSequenceProperties(std::ifstream& InFile, bool& OutbIsNestedSequence);
     void AddIndividualSequence(std::ifstream& InFile, const std::string& Filename, SequenceProperties Properties);
     std::shared_ptr<Checkpoint> FindCheckpoint(std::string CheckpointName);

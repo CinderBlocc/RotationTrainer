@@ -25,7 +25,7 @@ private:
 	bool isInSequence = false;
 	bool timerRunning = false;
 	std::chrono::steady_clock::time_point startTime;
-	std::string clockTime = "";
+	std::string clockTime;
 
 	//Locations of all cars (current and previous tick)
 	CarLocations localCarLocations;
