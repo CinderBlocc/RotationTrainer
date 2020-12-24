@@ -37,12 +37,11 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "0.9.0", PLUGINTYP
         - Partially implemented. It is an available property, but it doesn't actually set anything yet
 
     - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
+        - Formatting: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))>
     
-    - Have a location which sets boost so it can take away your boost. Use LocationType::LT_BOOST_SETTER - BoostSetter is an extension of CustomLocation
-    
-    - Have more locations players can go. Use LocationType::LT_CUSTOM_LOCATION
+    - Have more locations players can go. Use LocationType::LT_CUSTOM_LOCATION or LocationType::LT_BOOST_SETTER - BoostSetter is an extension of CustomLocation
         - Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
-            - Formatting: LOCATION(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
+            - Formatting: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
 */
 
 void RotationTrainer::onLoad()

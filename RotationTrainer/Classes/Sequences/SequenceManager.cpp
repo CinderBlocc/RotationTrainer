@@ -181,13 +181,28 @@ void SequenceManager::AddIndividualSequence(std::ifstream& InFile, const std::st
 {
     std::shared_ptr<IndividualSequence> ThisSequence = std::make_shared<IndividualSequence>(Filename, Properties);
 
-    std::string CheckpointName;
+    std::string LineOfText;
     while(!InFile.eof())
     {
-        getline(InFile, CheckpointName);
-        if(auto ThisCheckpoint = FindCheckpoint(CheckpointName))
+        getline(InFile, LineOfText);
+
+        //Check if the line matches one of the checkpoint codes
+        if(auto ThisCheckpoint = FindCheckpoint(LineOfText))
         {
             ThisSequence->AddCheckpoint(ThisCheckpoint);
+            continue;
+        }
+
+        //Check if the line is asking for a custom location
+        if(LineOfText.find("CUSTOM") != std::string::npos)
+        {
+            continue;
+        }
+
+        //Check if line is asking for a demo car
+        if(LineOfText.find("DEMOCAR") != std::string::npos)
+        {
+            continue;
         }
     }
 
