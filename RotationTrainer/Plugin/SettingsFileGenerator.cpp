@@ -33,6 +33,8 @@ void RotationTrainer::GenerateSettingsFile()
     nl("7");
     nl("0|Update sequence list|"  + cv(NOTIFIER_SEQUENCE_LOADALL));
     blank;
+    nl("4|Delay before next nested subsequence starts|" + cv(CVAR_NEXT_SEQUENCE_DELAY) + "|0|15");
+    blank;
     nl("8|");
     nl("9|SEQUENCE BUILDING TOOLS");
     nl("0|Get Car Info For Start Position/Rotation|openmenu console2; " + cv(NOTIFIER_GET_START_INFO));

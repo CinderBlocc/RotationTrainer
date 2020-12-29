@@ -1,45 +1,36 @@
-#include "bakkesmod\wrappers\includes.h"
 #include "RotationTrainer.h"
-
+#include "bakkesmod\wrappers\includes.h"
 #include "Sequences/SequenceManager.h"
 
-#include <fstream>
-#include <filesystem>
-#include <iterator>
-#include <cctype>
-#include <sstream>
-
-BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "0.9.0", PLUGINTYPE_CUSTOM_TRAINING)
+BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_FREEPLAY)
 
 /*
     TO-DO
 
-    - ADD SEQUENCE OF SEQUENCES: Just like a normal sequence.cfg, but it's a list of other sequences that will run once one sequence has ended and the player hits reset
-        - Really close to finishing this one, just re-read through everything until it makes sense and add the last bits
-        - Might want to pull the sequence list reading out of the LoadSequence function and bring it into StartSequence
-    
-    - Move sequence properties into the LoadedSequence struct so you can properly set properties when that sequence is called from the list of sequences
-    
-    - ADD PERSONAL BEST LIST
+    - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
         - Store (in a single file) a list of the local player's current bests for any sequence they've completed
         - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
+        - Store the top 5 times for each sequence?
     
-    - Pressing start doesn't stop timer (not sure if this is needed).
+    - Pressing start doesn't stop timer    ***SequenceTimer.cpp***
         - Use GameWrapper::IsPaused(). Would only work in freeplay or when a LAN host uses the admin pause feature
+        - Using accumulated deltas will fix the problem of time jumps after unpausing
     
-    - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
-        - ADD A 1 SECOND PENALTY PER SKIP. When sorting personal bests, it'll be much easier to track when an objective time change is in place
-            - Indicate a penalty will be added by displaying a red "+9s" below the clock. Add that to the time after the sequence is done
-    
-    - Set maximum boost cap to encourage flips to navigate the field. Make it a property ranging 0 - 100
-        - Partially implemented. It is an available property, but it doesn't actually set anything yet
+    - Skipping checkpoints    ***SequenceManager.cpp***
+        - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
+        - Display a red "Skipped X Checkpoints" below the clock. Add that to the record after the sequence is done
+            - Sort by time in the file, but show how many checkpoints were skipped next to the time
 
+    - CUSTOM LOCATIONS    ***SequenceContainer.cpp, SequenceManager.cpp (for spawning demo car)***
     - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
         - Formatting: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))>
-    
     - Have more locations players can go. Use LocationType::LT_CUSTOM_LOCATION or LocationType::LT_BOOST_SETTER - BoostSetter is an extension of CustomLocation
         - Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
             - Formatting: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
+
+    - ***RotationTrainer.cpp, SequenceManager.cpp?***
+    - If a nested sequence's subsequence finishes with a ball, start the next subsequence when the goal replay is done
+        - If it ends with a normal checkpoint, use the delay value before starting the next subsequence
 */
 
 std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
@@ -54,8 +45,11 @@ void RotationTrainer::onLoad()
 
     bEnabled = std::make_shared<bool>(false);
     SequenceName = std::make_shared<std::string>("");
+    NextSequenceDelay = std::make_shared<float>(0.f);
     cvarManager->registerCvar(CVAR_ENABLED, "1", "Enables rendering of checkpoints in rotation training plugin", true, true, 0, true, 1).bindTo(bEnabled);
     cvarManager->registerCvar(CVAR_SEQUENCE_NAME, "_Example", "Choose which sequence file to read", true).bindTo(SequenceName);
+    cvarManager->registerCvar(CVAR_NEXT_SEQUENCE_DELAY, "3", "Delay between subsequences", true, true, 0, true, 120).bindTo(NextSequenceDelay);
+    cvarManager->getCvar(CVAR_NEXT_SEQUENCE_DELAY).addOnValueChanged(std::bind(&RotationTrainer::OnDelayChanged, this));
 
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_LOADALL,   [this](std::vector<std::string> params){ReloadSequenceFiles();}, "Load all sequences", PERMISSION_ALL);
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_START,     [this](std::vector<std::string> params){StartSequence();}, std::string("Start sequence chosen in") + CVAR_SEQUENCE_NAME, PERMISSION_ALL);
@@ -93,8 +87,14 @@ void RotationTrainer::TryNextSubsequence()
     //Ends the current sequence and tries starting the next subsequence if it is a nested sequence
     if(SequencesManager->IsSequenceActive())
     {
+        SequencesManager->EndSequence();
         SequencesManager->TryNextSubsequence();
     }
+}
+
+void RotationTrainer::OnDelayChanged()
+{
+    SequencesManager->SetNextSequenceDelay(cvarManager->getCvar(CVAR_NEXT_SEQUENCE_DELAY).getFloatValue());
 }
 
 void RotationTrainer::TerminateSequence()

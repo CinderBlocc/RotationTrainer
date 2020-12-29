@@ -9,8 +9,6 @@
 
 /*
 
-    Apply sequence properties (i.e. car position) in StartSequence
-
     Handle personal bests writing in EndSequence?
         If you do that, you'll have to ensure the bests are only saved if the sequence was completed
         Don't want people skipping through sequences and getting insane bests
@@ -23,7 +21,6 @@ SequenceManager::SequenceManager(std::shared_ptr<GameWrapper> InGameWrapper)
 void SequenceManager::StartSequence(const std::string& InSequenceName)
 {
     CurrentNestedSequenceStep = 0;
-    CurrentSequenceStep = 0;
 
     //Get the CurrentSequence either directly, or from the NestedSequence subsequence index
     CurrentMainSequence = SequenceData->GetSequence(InSequenceName);
@@ -41,49 +38,56 @@ void SequenceManager::StartSequence(const std::string& InSequenceName)
         }
     }
 
-    //If the CurrentSequence is valid, start the sequence
-    if(CurrentSequence)
+    StartCurrentSequence();
+}
+
+void SequenceManager::StartCurrentSequence()
+{
+    CurrentSequenceStep = 0;
+
+    if(!CurrentSequence)
     {
-        //Apply the starting properties
-        CarWrapper Car = gameWrapper->GetLocalCar();
-        if(!Car.IsNull())
-        {
-            const SequenceProperties& Properties = CurrentSequence->GetProperties();
+        return;
+    }
+
+    //Apply the starting properties
+    CarWrapper Car = gameWrapper->GetLocalCar();
+    if(!Car.IsNull())
+    {
+        const SequenceProperties& Properties = CurrentSequence->GetProperties();
             
-            if(Properties.bSetStartBoost)
+        if(Properties.bSetStartBoost)
+        {
+            BoostWrapper Boost = Car.GetBoostComponent();
+            if(!Boost.IsNull())
             {
-                BoostWrapper Boost = Car.GetBoostComponent();
-                if(!Boost.IsNull())
-                {
-                    Boost.SetCurrentBoostAmount(Properties.StartBoostAmount / 100.f);
-                }
-            }
-
-            if(Properties.bSetStartPosition)
-            {
-                Car.SetVelocity(Vector(0, 0, 0));
-                Car.SetLocation(Properties.StartPosition);
-            }
-
-            if(Properties.bSetStartRotation)
-            {
-                Car.SetAngularVelocity(Vector(0, 0, 0), false);
-                Car.SetCarRotation(Properties.StartRotation);
+                Boost.SetCurrentBoostAmount(Properties.StartBoostAmount / 100.f);
             }
         }
 
-        //Start the sequence
-        bIsSequenceActive = true;
-        bEnabled = true;
-        Timer.StopTimer();
-        Timer.ResetTimer();
+        if(Properties.bSetStartPosition)
+        {
+            Car.SetVelocity(Vector(0, 0, 0));
+            Car.SetLocation(Properties.StartPosition);
+        }
+
+        if(Properties.bSetStartRotation)
+        {
+            Car.SetAngularVelocity(Vector(0, 0, 0), false);
+            Car.SetCarRotation(Properties.StartRotation);
+        }
     }
+
+    //Start the sequence
+    bIsSequenceActive = true;
+    bEnabled = true;
+    Timer.StopTimer();
+    Timer.ResetTimer();
 }
 
 void SequenceManager::EndSequence()
 {
     bIsSequenceActive = false;
-    CurrentMainSequence = nullptr;
     CurrentSequence = nullptr;
     CurrentSequenceStep = 0;
     Timer.StopTimer();
@@ -110,7 +114,10 @@ void SequenceManager::EndSequence()
 
 void SequenceManager::TryNextSubsequence()
 {
-    EndSequence();
+    if(IsSequenceActive())
+    {
+        EndSequence();
+    }
 
     //Try loading the next subsequence
     if(CurrentMainSequence && CurrentMainSequence->bIsNested)
@@ -120,12 +127,19 @@ void SequenceManager::TryNextSubsequence()
         //Cast main sequence to nested sequence and get its individual sequence at the currentNestedSequenceStep
         auto ThisNest = std::static_pointer_cast<NestedSequence>(CurrentMainSequence);
         CurrentSequence = ThisNest->GetSubsequence(CurrentNestedSequenceStep);
+
+        if(CurrentSequence)
+        {
+            StartCurrentSequence();
+        }
     }
 }
 
 void SequenceManager::Disable()
 {
     bEnabled = false;
+    CurrentSequence = nullptr;
+    CurrentMainSequence = nullptr;
     CurrentNestedSequenceStep = 0;
     EndSequence();
 }
@@ -143,7 +157,7 @@ const std::vector<std::string>& SequenceManager::GetSequenceFilenames()
 
 void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
 {
-    if(bEnabled)
+    if(bEnabled && !gameWrapper->IsPaused())
     {
         CheckpointNames.clear();
 
@@ -217,7 +231,8 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
             ++CurrentSequenceStep;
             if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
             {
-                TryNextSubsequence();                                           // Do something different if the sequence ends with the ball
+                EndSequence();
+                gameWrapper->SetTimeout(std::bind(&SequenceManager::TryNextSubsequence, this), NextSequenceDelay);
             }
         }
     }
@@ -266,31 +281,29 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
 
 void SequenceManager::RenderHUD(CanvasWrapper Canvas)
 {
-    if(!CurrentSequence)
-    {
-        return;
-    }
-
     //Draw the clock
     Timer.DrawTimer(Canvas);
 
-    //Draw the sequence title
-    Vector2 TextBase = {30, 250};
-    Canvas.SetColor(LinearColor{255,255,255,255});
-    Canvas.SetPosition(TextBase);
-    Canvas.DrawString(CurrentSequence->Name, 3, 3, true);
-    TextBase.Y += 50;
-
-    //Draw the sequence names in their respective colors
-    int CheckpointNamesSize = static_cast<int>(CheckpointNames.size());
-    for(int i = CheckpointNamesSize - 1; i >= 0; --i)
+    if(CurrentSequence)
     {
-        float ColorPerc = static_cast<float>(i) / (CheckpointNames.size() - 1);
-        float ColorOpacity = (i == CheckpointNamesSize - 1) ? 1.f : 0.5f;
-        Canvas.SetColor(RT::GetPercentageColor(ColorPerc, ColorOpacity));
-
+        //Draw the sequence title
+        Vector2 TextBase = {30, 250};
+        Canvas.SetColor(LinearColor{255,255,255,255});
         Canvas.SetPosition(TextBase);
-        Canvas.DrawString(CheckpointNames[i], 2, 2, true);
-        TextBase.Y += 30;
+        Canvas.DrawString(CurrentSequence->Name, 3, 3, true);
+        TextBase.Y += 50;
+
+        //Draw the sequence names in their respective colors
+        int CheckpointNamesSize = static_cast<int>(CheckpointNames.size());
+        for(int i = CheckpointNamesSize - 1; i >= 0; --i)
+        {
+            float ColorPerc = static_cast<float>(i) / (CheckpointNames.size() - 1);
+            float ColorOpacity = (i == CheckpointNamesSize - 1) ? 1.f : 0.5f;
+            Canvas.SetColor(RT::GetPercentageColor(ColorPerc, ColorOpacity));
+
+            Canvas.SetPosition(TextBase);
+            Canvas.DrawString(CheckpointNames[i], 2, 2, true);
+            TextBase.Y += 30;
+        }
     }
 }

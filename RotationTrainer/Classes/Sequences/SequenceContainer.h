@@ -27,10 +27,6 @@ private:
     std::vector<std::shared_ptr<PendingNestedSequence>> AllPendingNestedSequences;
     std::vector<std::shared_ptr<Checkpoint>> DefaultCheckpoints;
 
-    //Default checkpoints
-    void FillDefaultCheckpoints();
-    std::shared_ptr<Checkpoint> FindDefaultCheckpoint(const std::string& CheckpointName);
-
     //All sequences in folder
     void GetAllSequenceFiles(std::filesystem::path InDirectory);
     
@@ -41,4 +37,12 @@ private:
     //Nested sequences
     void AddPendingNestedSequence(std::ifstream& InFile, const std::string& Filename);
     void CompletePendingNestedSequenceRequests();
+
+    //Custom checkpoints
+    std::shared_ptr<Checkpoint> MakeCustomCheckpoint(const std::string& InLine);
+    std::shared_ptr<Checkpoint> MakeDemoCarCheckpoint(const std::string& InLine);
+
+    //Default checkpoints
+    void FillDefaultCheckpoints();
+    std::shared_ptr<Checkpoint> FindDefaultCheckpoint(const std::string& CheckpointName);
 };

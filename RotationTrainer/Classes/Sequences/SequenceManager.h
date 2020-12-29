@@ -22,6 +22,7 @@ public:
     void Disable();
 
     bool IsSequenceActive() { return bIsSequenceActive; }
+    void SetNextSequenceDelay(float InDelay) { NextSequenceDelay = InDelay; }
 
     //Rendering and collision
     void TickSequence(CanvasWrapper Canvas, ServerWrapper Server);
@@ -37,7 +38,7 @@ private:
     std::shared_ptr<GameWrapper> gameWrapper;
 
     std::shared_ptr<SequenceContainer> SequenceData;
-    std::shared_ptr<Sequence> CurrentMainSequence; //Could be a nested sequence. If individual, it will be the same as CurrentSequence
+    std::shared_ptr<Sequence> CurrentMainSequence;
     std::shared_ptr<IndividualSequence> CurrentSequence;
 
     SequenceTimer Timer;
@@ -47,6 +48,9 @@ private:
     int CurrentSequenceStep = 0;
     int CurrentNestedSequenceStep = 0;
     int NumCheckpointsToDisplay = 5;
+    float NextSequenceDelay = 3.f;
+
+    void StartCurrentSequence();
 
     void CheckCollisions(ServerWrapper Server);
     void RenderCheckpoints(CanvasWrapper Canvas);

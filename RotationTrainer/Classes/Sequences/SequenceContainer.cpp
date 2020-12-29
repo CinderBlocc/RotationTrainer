@@ -13,6 +13,12 @@
 #include <iterator>
 #include <sstream>
 
+/*
+
+    Need to add the CUSTOM and DEMOCAR checkpoint implementations
+
+*/
+
 SequenceContainer::SequenceContainer()
 {
     FillDefaultCheckpoints();
@@ -115,6 +121,12 @@ SequenceProperties SequenceContainer::GetSequenceProperties(std::ifstream& InFil
         //Search for the "begin properties" or "begin sequence" notice
         getline(InFile, Line);
 
+        //Use # for comments
+        if(!Line.empty() && Line.at(0) == '#')
+        {
+            continue;
+        }
+
         //Capitalize all letters in string
         for(char& c : Line) { c = toupper(c); }
 
@@ -204,6 +216,12 @@ void SequenceContainer::AddIndividualSequence(std::ifstream& InFile, const std::
     {
         getline(InFile, LineOfText);
 
+        //Use # for comments
+        if(!LineOfText.empty() && LineOfText.at(0) == '#')
+        {
+            continue;
+        }
+
         //Check if the line matches one of the checkpoint codes
         if(auto ThisCheckpoint = FindDefaultCheckpoint(LineOfText))
         {
@@ -214,14 +232,27 @@ void SequenceContainer::AddIndividualSequence(std::ifstream& InFile, const std::
         //Check if the line is asking for a custom location
         if(LineOfText.find("CUSTOM") != std::string::npos)
         {
+            if(auto ThisCheckpoint = MakeCustomCheckpoint(LineOfText))
+            {
+                ThisSequence->AddCheckpoint(ThisCheckpoint);
+            }
             continue;
         }
 
         //Check if line is asking for a demo car
         if(LineOfText.find("DEMOCAR") != std::string::npos)
         {
+            if(auto ThisCheckpoint = MakeDemoCarCheckpoint(LineOfText))
+            {
+                ThisSequence->AddCheckpoint(ThisCheckpoint);
+            }
             continue;
         }
+    }
+
+    if(Properties.bUsesBall)
+    {
+        ThisSequence->AddCheckpoint(FindDefaultCheckpoint("Ball"));
     }
 
     AllSequences.push_back(ThisSequence);
@@ -253,6 +284,28 @@ void SequenceContainer::CompletePendingNestedSequenceRequests()
 
     //Clear the list of pending sequences
     AllPendingNestedSequences.clear();
+}
+
+
+// Custom checkpoints //
+std::shared_ptr<Checkpoint> SequenceContainer::MakeCustomCheckpoint(const std::string& InLine)
+{
+    //Format: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
+    //Values do not need to be in any particular order
+
+    //If no RADIUS is supplied, give it a default radius of 200 or something between the small and big pad sizes
+
+    //If the formatting is too wrong, return nullptr
+    return nullptr;
+}
+
+std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::string& InLine)
+{
+    //Format: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))> - brackets indicate optional value
+    //Values do not need to be in any particular order
+    
+    //If the formatting is too wrong, return nullptr
+    return nullptr;
 }
 
 

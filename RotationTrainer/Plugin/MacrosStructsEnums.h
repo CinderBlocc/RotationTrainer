@@ -13,6 +13,7 @@ extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 // MACROS //
 #define CVAR_ENABLED               "Rotation_Enabled"
 #define CVAR_SEQUENCE_NAME         "Rotation_SequenceName"
+#define CVAR_NEXT_SEQUENCE_DELAY   "Rotation_NextSequenceDelay"
 #define NOTIFIER_SEQUENCE_LOADALL  "Rotation_LoadAllSequences"
 #define NOTIFIER_SEQUENCE_START    "Rotation_StartSequence"
 #define NOTIFIER_SEQUENCE_END      "Rotation_EndSequence"

@@ -1,9 +1,7 @@
 #pragma once
-#pragma comment(lib, "pluginsdk.lib")
+#pragma comment(lib, "PluginSDK.lib")
 #include "bakkesmod/plugin/bakkesmodplugin.h"
-#include "Checkpoints/Checkpoint.h"
 #include "MacrosStructsEnums.h"
-#include "RenderingTools.h"
 
 class SequenceManager;
 
@@ -15,6 +13,7 @@ private:
 	//Cvars
 	std::shared_ptr<bool> bEnabled;
 	std::shared_ptr<std::string> SequenceName;
+    std::shared_ptr<float> NextSequenceDelay;
 
 public:
 	void onLoad() override;
@@ -24,6 +23,7 @@ public:
 	void StartSequence();
 	void EndSequence();
     void TryNextSubsequence();
+    void OnDelayChanged();
 	void TerminateSequence();
 	void RestartSequence();
     void ReloadSequenceFiles();
