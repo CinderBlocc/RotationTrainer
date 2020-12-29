@@ -1,37 +1,56 @@
 #pragma once
-#include <vector>
 #include <memory>
 #include <string>
-#include <fstream>
+#include <filesystem>
+#include <vector>
+#include "bakkesmod/plugin/bakkesmodplugin.h"
+#include "SequenceTimer.h"
 
-struct SequenceProperties;
-class PendingNestedSequence;
-class IndividualSequence;
-class NestedSequence;
+class SequenceContainer;
 class Sequence;
-class Checkpoint;
+class IndividualSequence;
 
 class SequenceManager
 {
 public:
-    SequenceManager(std::vector<std::shared_ptr<Checkpoint>>* InCheckpoints);
+    SequenceManager(std::shared_ptr<GameWrapper> InGameWrapper);
 
-    void LoadAllSequences(std::filesystem::path InDirectory);
+    //Gameplay handling
+    void StartSequence(const std::string& InSequenceName);
+    void EndSequence();
+    void TryNextSubsequence();
+    void Disable();
+
+    bool IsSequenceActive() { return bIsSequenceActive; }
+
+    //Rendering and collision
+    void TickSequence(CanvasWrapper Canvas, ServerWrapper Server);
+    void SetNumCheckpointsToDisplay(int NewNumCheckpoints) { NumCheckpointsToDisplay = NewNumCheckpoints; }
+
+    //Info about which sequences are ready to go
+    void LoadSequencesInFolder(std::filesystem::path InDirectory);
     const std::vector<std::string>& GetSequenceFilenames();
 
 private:
     SequenceManager() = delete;
 
-    std::vector<std::string> AllSequenceFileNames;
-    std::vector<std::shared_ptr<Sequence>> AllSequences;
-    std::vector<std::shared_ptr<PendingNestedSequence>> AllPendingNestedSequences;
+    std::shared_ptr<GameWrapper> gameWrapper;
 
-    std::vector<std::shared_ptr<Checkpoint>>* AllCheckpoints;
+    std::shared_ptr<SequenceContainer> SequenceData;
+    std::shared_ptr<Sequence> CurrentMainSequence; //Could be a nested sequence. If individual, it will be the same as CurrentSequence
+    std::shared_ptr<IndividualSequence> CurrentSequence;
 
-    void GetAllSequenceFiles(std::filesystem::path InDirectory);
-    SequenceProperties GetSequenceProperties(std::ifstream& InFile, bool& OutbIsNestedSequence);
-    void AddIndividualSequence(std::ifstream& InFile, const std::string& Filename, SequenceProperties Properties);
-    std::shared_ptr<Checkpoint> FindCheckpoint(std::string CheckpointName);
-    void AddPendingNestedSequence(std::ifstream& InFile, const std::string& Filename);
-    void CompletePendingNestedSequenceRequests();
+    SequenceTimer Timer;
+
+    bool bEnabled = false;
+    bool bIsSequenceActive = false;
+    int CurrentSequenceStep = 0;
+    int CurrentNestedSequenceStep = 0;
+    int NumCheckpointsToDisplay = 5;
+
+    void CheckCollisions(ServerWrapper Server);
+    void RenderCheckpoints(CanvasWrapper Canvas);
+    void RenderHUD(CanvasWrapper Canvas);
+
+    std::vector<std::string> CheckpointNames;
 };

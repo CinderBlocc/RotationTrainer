@@ -99,17 +99,11 @@
     <ClCompile Include="Classes\Checkpoints\PostCheckpoint.cpp">
       <Filter>Classes\Checkpoints</Filter>
     </ClCompile>
-    <ClCompile Include="Plugin\CheckpointsList.cpp">
-      <Filter>Plugin\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Plugin\RotationTrainer.cpp">
       <Filter>Plugin\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Plugin\SettingsFileGenerator.cpp">
       <Filter>Plugin\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Classes\Sequences\SequenceManager.cpp">
-      <Filter>Classes\Sequences</Filter>
     </ClCompile>
     <ClCompile Include="Classes\Sequences\NestedSequence.cpp">
       <Filter>Classes\Sequences</Filter>
@@ -125,6 +119,15 @@
     </ClCompile>
     <ClCompile Include="Classes\Checkpoints\LocationCheckpoint.cpp">
       <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\SequenceContainer.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\SequenceManager.cpp">
+      <Filter>Classes\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Sequences\SequenceTimer.cpp">
+      <Filter>Classes\Sequences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,9 +206,6 @@
     <ClInclude Include="Plugin\MacrosStructsEnums.h">
       <Filter>Plugin\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Classes\Sequences\SequenceManager.h">
-      <Filter>Classes\Sequences</Filter>
-    </ClInclude>
     <ClInclude Include="Classes\Sequences\NestedSequence.h">
       <Filter>Classes\Sequences</Filter>
     </ClInclude>
@@ -223,6 +223,15 @@
     </ClInclude>
     <ClInclude Include="Classes\Checkpoints\LocationCheckpoint.h">
       <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\SequenceContainer.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\SequenceManager.h">
+      <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Sequences\SequenceTimer.h">
+      <Filter>Classes\Sequences</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

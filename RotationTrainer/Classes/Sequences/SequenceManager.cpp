@@ -1,249 +1,239 @@
 #include "SequenceManager.h"
-#include "Checkpoints/Checkpoint.h" // <-- probably need to import each type of checkpoint
-#include "Sequences/SequenceProperties.h"
-#include "Sequences/PendingNestedSequence.h"
-#include "Sequences/IndividualSequence.h"
-#include "Sequences/NestedSequence.h"
-#include "Sequences/Sequence.h"
-#include <filesystem>
-#include <iterator>
-#include <sstream>
+#include "SequenceContainer.h"
+#include "MacrosStructsEnums.h"
+#include "Sequence.h"
+#include "NestedSequence.h"
+#include "IndividualSequence.h"
+#include "Checkpoints/Checkpoint.h"
+#include "RenderingTools.h"
 
-//Stores a pointer to the list of checkpoints stored in the plugin so that it can be used to fill individual sequences
-SequenceManager::SequenceManager(std::vector<std::shared_ptr<Checkpoint>>* InCheckpoints) : AllCheckpoints(InCheckpoints) {}
+/*
 
+    Apply sequence properties (i.e. car position) in StartSequence
 
-void SequenceManager::LoadAllSequences(std::filesystem::path InDirectory)
+    Handle personal bests writing in EndSequence?
+        If you do that, you'll have to ensure the bests are only saved if the sequence was completed
+        Don't want people skipping through sequences and getting insane bests
+
+*/
+
+SequenceManager::SequenceManager(std::shared_ptr<GameWrapper> InGameWrapper)
+    : gameWrapper(InGameWrapper), SequenceData(std::make_shared<SequenceContainer>()), CurrentSequence(nullptr) {}
+
+void SequenceManager::StartSequence(const std::string& InSequenceName)
 {
-    //Clean out the current sequences
-    AllSequences.clear();
+    CurrentNestedSequenceStep = 0;
+    CurrentSequenceStep = 0;
 
-    //Get all the files that contain sequences
-    GetAllSequenceFiles(InDirectory);
-
-    //Fill the vector with individual sequences
-    //If it is a nested sequence, create a pending request
-    for(const auto& SequenceFileName : AllSequenceFileNames)
+    //Get the CurrentSequence either directly, or from the NestedSequence subsequence index
+    CurrentMainSequence = SequenceData->GetSequence(InSequenceName);
+    if(CurrentMainSequence)
     {
-        std::ifstream InFile = std::ifstream(InDirectory / std::string(SequenceFileName + ".cfg"));
-        bool bIsNestedSequence = false;
-
-        //Get the sequence properties
-        SequenceProperties Properties = GetSequenceProperties(InFile, bIsNestedSequence);
-
-        //Failed to find sequence indicator. Skip to the next file
-        if(InFile.eof())
+        if(CurrentMainSequence->bIsNested)
         {
-            InFile.close();
-            continue;
-        }
-
-        //Choose the type of sequence to build
-        if(bIsNestedSequence)
-        {
-            AddPendingNestedSequence(InFile, SequenceFileName);
+            //Cast main sequence to nested sequence and get its individual sequence at the currentNestedSequenceStep
+            auto ThisNest = std::static_pointer_cast<NestedSequence>(CurrentMainSequence);
+            CurrentSequence = ThisNest->GetSubsequence(CurrentNestedSequenceStep);
         }
         else
         {
-            AddIndividualSequence(InFile, SequenceFileName, Properties);
+            CurrentSequence = std::static_pointer_cast<IndividualSequence>(CurrentMainSequence);
         }
-
-        InFile.close();
     }
 
-    //Once the individual sequences are loaded, fill the nested sequences with the correct pointers
-    CompletePendingNestedSequenceRequests();
+    //If the CurrentSequence is valid, start the sequence
+    if(CurrentSequence)
+    {
+        bIsSequenceActive = true;
+        bEnabled = true;
+        Timer.StopTimer();
+        Timer.ResetTimer();
+
+        /*
+        
+            APPLY THE SEQUENCE PROPERTIES HERE
+        
+        */
+    }
+}
+
+void SequenceManager::EndSequence()
+{
+    bIsSequenceActive = false;
+    CurrentMainSequence = nullptr;
+    CurrentSequence = nullptr;
+    CurrentSequenceStep = 0;
+    Timer.StopTimer();
+
+    /*
+        
+        Handle personal bests here if player completed the whole sequence
+    
+        - Open the personal.bests file
+        - Check if the current sequence's name is listed there
+            - If not, add the current run to the list and close file
+            - If it is, compare current run to run in file
+                - If nothing improved, close file
+                - If there was improvement, overwrite the listing in the file with the current run, then close the file
+
+        DATA FOR PERSONAL BESTS - sorted by priority
+        - Time
+        - Locations missed/skipped
+            - Maybe add a 3 second penalty for each pad skipped so that it sorts the time better
+    
+    
+    */
+}
+
+void SequenceManager::TryNextSubsequence()
+{
+    EndSequence();
+
+    //Try loading the next subsequence
+    if(CurrentMainSequence && CurrentMainSequence->bIsNested)
+    {
+        ++CurrentNestedSequenceStep;
+
+        //Cast main sequence to nested sequence and get its individual sequence at the currentNestedSequenceStep
+        auto ThisNest = std::static_pointer_cast<NestedSequence>(CurrentMainSequence);
+        CurrentSequence = ThisNest->GetSubsequence(CurrentNestedSequenceStep);
+    }
+}
+
+void SequenceManager::Disable()
+{
+    bEnabled = false;
+    CurrentNestedSequenceStep = 0;
+    EndSequence();
+}
+
+void SequenceManager::LoadSequencesInFolder(std::filesystem::path InDirectory)
+{
+    SequenceData = std::make_shared<SequenceContainer>();
+    SequenceData->LoadAllSequences(InDirectory);
 }
 
 const std::vector<std::string>& SequenceManager::GetSequenceFilenames()
 {
-    return AllSequenceFileNames;
+    return SequenceData->GetSequenceFilenames();
 }
 
-void SequenceManager::GetAllSequenceFiles(std::filesystem::path InDirectory)
+void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
 {
-    //Loop through every file in the sequences folder, and store the filenames of the ones that are to be used
-    
-    //Clear all references to files
-    AllSequenceFileNames.clear();
-
-    std::error_code ec;
-    if(!std::filesystem::exists(InDirectory, ec))
+    if(bEnabled)
     {
-        return;
-    }
+        CheckpointNames.clear();
 
-    //Loop through all files in the ColorChanger data folder to find config files
-    for(const auto &entry : std::filesystem::directory_iterator(InDirectory))
-    {
-        if(entry.path().extension().u8string() == ".cfg")
+        if(bIsSequenceActive)
         {
-            std::string name = entry.path().stem().u8string();
-            AllSequenceFileNames.push_back(name);
+            CheckCollisions(Server);
+            RenderCheckpoints(Canvas);
         }
+
+        RenderHUD(Canvas);
     }
 }
 
-SequenceProperties SequenceManager::GetSequenceProperties(std::ifstream& InFile, bool& OutbIsNestedSequence)
+void SequenceManager::CheckCollisions(ServerWrapper Server)
 {
-    SequenceProperties OutputProperties;
+    //Get ball
+    if(Server.IsNull()) return;
+    BallWrapper Ball = Server.GetBall();
+    if(Ball.IsNull()) return;
 
-    bool bFoundProperties = false;
-    bool bFoundSequence = false;
+    //Get car locations
+    CarWrapper LocalCar = gameWrapper->GetLocalCar();
+    if(LocalCar.IsNull()) return;
+    PriWrapper PRI = LocalCar.GetPRI();
+    if(PRI.IsNull()) return;
 
-    std::string Line;
-    while(!InFile.eof())
+    //Since this is used for the current tick and the last tick, use a static variable
+    static CarLocations CarLine;
+    CarLine.PlayerID = PRI.GetUniqueIdWrapper();
+    CarLine.LastLocation = CarLine.CurrentLocation;
+    CarLine.CurrentLocation = LocalCar.GetLocation();
+
+    auto ThisCheckpoint = CurrentSequence->GetCheckpoint(CurrentSequenceStep);
+    if(ThisCheckpoint)
     {
-        //Search for the "begin properties" or "begin sequence" notice
-        getline(InFile, Line);
-
-        //Capitalize all letters in string
-        for(char& c : Line) { c = toupper(c); }
-
-        if(Line == "BEGIN PROPERTIES")
+        //Freeze the ball unless it is the current target
+        if(ThisCheckpoint->GetName() != "Ball")
         {
-            //Properties section has started
-            bFoundProperties = true;
-            continue;
-        }
-        if(Line == "BEGIN SEQUENCE")
-        {
-            //Normal sequence. Properties are done, exit function
-            bFoundSequence = true;
-            OutbIsNestedSequence = false;
-            break;
-        }
-        if(Line == "BEGIN SEQUENCE LIST")
-        {
-            //Nested sequence. Properties are done, exit function
-            bFoundSequence = true;
-            OutbIsNestedSequence = true;
-            break;
+            Ball.SetLocation(Vector(0, 0, 93.2f));
+            Ball.SetRotation(Rotator(0,0,0));
+            Ball.SetVelocity(Vector(0,0,0));
+            Ball.SetAngularVelocity(Vector(0,0,0), false);
         }
 
-        //Properties section has been found, search for individual properties
-        if(bFoundProperties)
+        if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))
         {
-            if(Line == "NO BALL")
+            //Start timer on first checkpoint collision
+            if(!Timer.GetbTimerRunning())
             {
-                OutputProperties.bUsesBall = false;
+                Timer.ResetTimer();
+                Timer.StartTimer();
             }
 
-            //Put strings into a stream for iterations
-            std::stringstream LineStream(Line);
-            std::istream_iterator<std::string> IterBegin(LineStream), IterEnd;
-            std::vector<std::string> SplitStrings(IterBegin, IterEnd);
-
-            if(SplitStrings.size() >= 3 && SplitStrings[0] == "BOOST")
+            //Increment to next sequence step
+            ++CurrentSequenceStep;
+            if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
             {
-                //[0]BOOST [1]START [2]<value>
-                if(SplitStrings[1] == "START")
-                {
-                    OutputProperties.bSetStartBoost   = true;
-                    OutputProperties.StartBoostAmount = stoi(SplitStrings[2]);
-                }
-
-                //[0]BOOST [1]MAX [2]<value>
-                if(SplitStrings[1] == "MAX")
-                {
-                    OutputProperties.bSetMaxBoost   = true;
-                    OutputProperties.MaxBoostAmount = stoi(SplitStrings[2]);
-                }
-            }
-
-            if(SplitStrings.size() >= 4)
-            {
-                //[0]POSITION [1]<X> [2]<Y> [3]<Z>
-                if(SplitStrings[0] == "POSITION")
-                {
-                    OutputProperties.bSetStartPosition = true;
-                    OutputProperties.StartPosition.X   = stof(SplitStrings[1]);
-                    OutputProperties.StartPosition.Y   = stof(SplitStrings[2]);
-                    OutputProperties.StartPosition.Z   = stof(SplitStrings[3]);
-                }
-
-                //[0]ROTATION [1]<Pitch> [2]<Yaw> [3]<Roll>
-                if(SplitStrings[0] == "ROTATION")
-                {
-                    OutputProperties.bSetStartRotation   = true;
-                    OutputProperties.StartRotation.Pitch = static_cast<int>(stof(SplitStrings[1]) * CONST_DegToUnrRot);
-                    OutputProperties.StartRotation.Yaw   = static_cast<int>(stof(SplitStrings[2]) * CONST_DegToUnrRot);
-                    OutputProperties.StartRotation.Roll  = static_cast<int>(stof(SplitStrings[3]) * CONST_DegToUnrRot);
-                }
+                TryNextSubsequence();
             }
         }
     }
-
-    return OutputProperties;
 }
 
-void SequenceManager::AddIndividualSequence(std::ifstream& InFile, const std::string& Filename, SequenceProperties Properties)
+void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
 {
-    std::shared_ptr<IndividualSequence> ThisSequence = std::make_shared<IndividualSequence>(Filename, Properties);
+    float AnimTime = clock() / 1000.f;
 
-    std::string LineOfText;
-    while(!InFile.eof())
+    CameraWrapper Camera = gameWrapper->GetCamera();
+    if(Camera.IsNull()) return;
+    RT::Frustum Frustum(Canvas, Camera);
+
+    //Need to draw from the back to the front.
+    //If drawing from front to back, and if the next point and the third point are the same,
+    //the third point would draw on top of the next point
+    for(int i = NumCheckpointsToDisplay - 1; i >= 0; --i)
     {
-        getline(InFile, LineOfText);
-
-        //Check if the line matches one of the checkpoint codes
-        if(auto ThisCheckpoint = FindCheckpoint(LineOfText))
+        if(CurrentSequenceStep + i < static_cast<int>(CurrentSequence->GetSequenceSize()))
         {
-            ThisSequence->AddCheckpoint(ThisCheckpoint);
-            continue;
-        }
-
-        //Check if the line is asking for a custom location
-        if(LineOfText.find("CUSTOM") != std::string::npos)
-        {
-            continue;
-        }
-
-        //Check if line is asking for a demo car
-        if(LineOfText.find("DEMOCAR") != std::string::npos)
-        {
-            continue;
+            if(auto ThisCheckpoint = CurrentSequence->GetCheckpoint(CurrentSequenceStep + i))
+            {
+                float ColorPerc = static_cast<float>(i) / (NumCheckpointsToDisplay - 1);
+                float ColorOpacity = (i == 0) ? 1.f : 0.33f;
+                Canvas.SetColor(RT::GetPercentageColor(1 - ColorPerc, ColorOpacity));
+                
+                ThisCheckpoint->Draw(Canvas, Camera, Frustum, AnimTime);
+                CheckpointNames.push_back(ThisCheckpoint->GetName());
+            }
         }
     }
-
-    AllSequences.push_back(ThisSequence);
 }
 
-std::shared_ptr<Checkpoint> SequenceManager::FindCheckpoint(std::string CheckpointName)
+void SequenceManager::RenderHUD(CanvasWrapper Canvas)
 {
-    for(const auto& ThisCheckpoint : *AllCheckpoints)
+    //Draw the clock
+    Timer.DrawTimer(Canvas);
+
+    //Draw the sequence title
+    Vector2 TextBase = {30, 250};
+    Canvas.SetColor(LinearColor{255,255,255,255});
+    Canvas.SetPosition(TextBase);
+    Canvas.DrawString(CurrentSequence->Name, 3, 3, true);
+    TextBase.Y += 50;
+
+    //Draw the sequence names in their respective colors
+    int CheckpointNamesSize = static_cast<int>(CheckpointNames.size());
+    for(int i = CheckpointNamesSize - 1; i >= 0; --i)
     {
-        if(ThisCheckpoint->GetName() == CheckpointName)
-        {
-            return ThisCheckpoint;
-        }
+        float ColorPerc = static_cast<float>(i) / (CheckpointNames.size() - 1);
+        float ColorOpacity = (i == CheckpointNamesSize - 1) ? 1.f : 0.5f;
+        Canvas.SetColor(RT::GetPercentageColor(ColorPerc, ColorOpacity));
+
+        Canvas.SetPosition(TextBase);
+        Canvas.DrawString(CheckpointNames[i], 2, 2, true);
+        TextBase.Y += 30;
     }
-
-    return nullptr;
-}
-
-void SequenceManager::AddPendingNestedSequence(std::ifstream& InFile, const std::string& Filename)
-{
-    std::shared_ptr<PendingNestedSequence> ThisPendingSequence = std::make_shared<PendingNestedSequence>(Filename);
-
-    std::string SequenceName;
-    while(!InFile.eof())
-    {
-        getline(InFile, SequenceName);
-        ThisPendingSequence->AddSequenceRequest(SequenceName);
-    }
-
-    AllPendingNestedSequences.push_back(ThisPendingSequence);
-}
-
-void SequenceManager::CompletePendingNestedSequenceRequests()
-{
-    //Convert all pending nested sequences into a full nested sequence
-    for(const auto& PendingSequence : AllPendingNestedSequences)
-    {
-        AllSequences.push_back(PendingSequence->CreateNestedSequence(AllSequences));
-    }
-
-    //Clear the list of pending sequences
-    AllPendingNestedSequences.clear();
 }

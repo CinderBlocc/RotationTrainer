@@ -8,9 +8,9 @@
 #define blank setFile << '\n'
 #define cv(x) std::string(x)
 
-void RotationTrainer::RebuildSettingsFile()
+void RotationTrainer::GenerateSettingsFile()
 {
-    std::ofstream setFile("./bakkesmod/plugins/settings/RotationTrainer.set");
+    std::ofstream setFile(gameWrapper->GetBakkesModPath() / "plugins" / "settings" / "RotationTrainer.set");
 
     nl("Rotation Trainer");
     nl("1|Enable plugin|" + cv(CVAR_ENABLED));
@@ -31,7 +31,7 @@ void RotationTrainer::RebuildSettingsFile()
     blank;
     nl("6|Sequence Name|"  + cv(CVAR_SEQUENCE_NAME) + "|" << RebuildSettingsGetCFGFiles());
     nl("7");
-    nl("0|Update sequence list|"  + cv(NOTIFIER_REBUILD_UI));
+    nl("0|Update sequence list|"  + cv(NOTIFIER_SEQUENCE_LOADALL));
     blank;
     nl("8|");
     nl("9|SEQUENCE BUILDING TOOLS");

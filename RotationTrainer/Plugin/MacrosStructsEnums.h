@@ -5,11 +5,14 @@
 #include <vector>
 #include <memory>
 
+
+extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
+
+
 // MACROS //
 #define CVAR_ENABLED               "Rotation_Enabled"
 #define CVAR_RENDER_TYPE           "Rotation_RenderType"
 #define CVAR_SEQUENCE_NAME         "Rotation_SequenceName"
-#define NOTIFIER_REBUILD_UI        "Rotation_RebuildUI"
 #define NOTIFIER_SEQUENCE_LOADALL  "Rotation_LoadAllSequences"
 #define NOTIFIER_SEQUENCE_START    "Rotation_StartSequence"
 #define NOTIFIER_SEQUENCE_END      "Rotation_EndSequence"

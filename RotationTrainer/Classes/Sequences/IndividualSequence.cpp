@@ -17,3 +17,13 @@ void IndividualSequence::RemoveCheckpoint(size_t Index)
 
     Checkpoints.erase(Checkpoints.begin() + Index);
 }
+
+const std::shared_ptr<Checkpoint> IndividualSequence::GetCheckpoint(int Index)
+{
+    if(Index >= Checkpoints.size())
+    {
+        return nullptr;
+    }
+
+    return Checkpoints[Index];
+}

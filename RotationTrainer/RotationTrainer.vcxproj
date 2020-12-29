@@ -84,8 +84,9 @@
     <ClCompile Include="Classes\Sequences\IndividualSequence.cpp" />
     <ClCompile Include="Classes\Sequences\PendingNestedSequence.cpp" />
     <ClCompile Include="Classes\Sequences\Sequence.cpp" />
+    <ClCompile Include="Classes\Sequences\SequenceContainer.cpp" />
     <ClCompile Include="Classes\Sequences\SequenceManager.cpp" />
-    <ClCompile Include="Plugin\CheckpointsList.cpp" />
+    <ClCompile Include="Classes\Sequences\SequenceTimer.cpp" />
     <ClCompile Include="Plugin\RotationTrainer.cpp" />
     <ClCompile Include="Plugin\SettingsFileGenerator.cpp" />
   </ItemGroup>
@@ -118,8 +119,10 @@
     <ClInclude Include="Classes\Sequences\IndividualSequence.h" />
     <ClInclude Include="Classes\Sequences\PendingNestedSequence.h" />
     <ClInclude Include="Classes\Sequences\Sequence.h" />
+    <ClInclude Include="Classes\Sequences\SequenceContainer.h" />
     <ClInclude Include="Classes\Sequences\SequenceManager.h" />
     <ClInclude Include="Classes\Sequences\SequenceProperties.h" />
+    <ClInclude Include="Classes\Sequences\SequenceTimer.h" />
     <ClInclude Include="Plugin\RotationTrainer.h" />
     <ClInclude Include="Plugin\MacrosStructsEnums.h" />
   </ItemGroup>

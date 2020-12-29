@@ -15,6 +15,9 @@ public:
     void AddCheckpoint(std::shared_ptr<Checkpoint> InCheckpoint);
     void RemoveCheckpoint(size_t Index);
 
+    const std::shared_ptr<Checkpoint> GetCheckpoint(int Index);
+    size_t GetSequenceSize() { return Checkpoints.size(); }
+
 private:
     std::vector<std::shared_ptr<Checkpoint>> Checkpoints;
     SequenceProperties Properties;
