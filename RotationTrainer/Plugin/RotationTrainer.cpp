@@ -14,8 +14,6 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "0.9.0", PLUGINTYP
 /*
     TO-DO
 
-    - Get sequences to render again
-
     - ADD SEQUENCE OF SEQUENCES: Just like a normal sequence.cfg, but it's a list of other sequences that will run once one sequence has ended and the player hits reset
         - Really close to finishing this one, just re-read through everything until it makes sense and add the last bits
         - Might want to pull the sequence list reading out of the LoadSequence function and bring it into StartSequence
@@ -54,11 +52,9 @@ void RotationTrainer::onLoad()
     SequencesManager = std::make_shared<SequenceManager>(gameWrapper);
     SequencesManager->LoadSequencesInFolder(DEFAULT_CONFIG_DIRECTORY);
 
-    enabled = std::make_shared<bool>(false);
-    renderType = std::make_shared<std::string>("");
+    bEnabled = std::make_shared<bool>(false);
     SequenceName = std::make_shared<std::string>("");
-    cvarManager->registerCvar(CVAR_ENABLED, "1", "Enables rendering of checkpoints in rotation training plugin", true, true, 0, true, 1).bindTo(enabled);
-    cvarManager->registerCvar(CVAR_RENDER_TYPE, "ALL", "Choose which type of object to render", true).bindTo(renderType);
+    cvarManager->registerCvar(CVAR_ENABLED, "1", "Enables rendering of checkpoints in rotation training plugin", true, true, 0, true, 1).bindTo(bEnabled);
     cvarManager->registerCvar(CVAR_SEQUENCE_NAME, "_Example", "Choose which sequence file to read", true).bindTo(SequenceName);
 
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_LOADALL,   [this](std::vector<std::string> params){ReloadSequenceFiles();}, "Load all sequences", PERMISSION_ALL);
@@ -71,7 +67,7 @@ void RotationTrainer::onLoad()
     gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", std::bind(&RotationTrainer::TryNextSubsequence, this));
     gameWrapper->HookEventPost("Function TAGame.GameInfo_TA.PlayerResetTraining", std::bind(&RotationTrainer::RestartSequence, this));
 
-    gameWrapper->RegisterDrawable(bind(&RotationTrainer::Tick, this, std::placeholders::_1));
+    gameWrapper->RegisterDrawable(std::bind(&RotationTrainer::Tick, this, std::placeholders::_1));
 
     GenerateSettingsFile();
 }
@@ -81,9 +77,10 @@ void RotationTrainer::onUnload() {}
 // SEQUENCE CONTROL //
 void RotationTrainer::StartSequence()
 {
-    if(!(*enabled) || gameWrapper->IsInOnlineGame()) { return; }
-
-    SequencesManager->StartSequence(*SequenceName);
+    if(*bEnabled && gameWrapper->IsInFreeplay())
+    {
+        SequencesManager->StartSequence(*SequenceName);
+    }
 }
 
 void RotationTrainer::EndSequence()
@@ -118,6 +115,9 @@ void RotationTrainer::RestartSequence()
 
 void RotationTrainer::ReloadSequenceFiles()
 {
+    //Make sure no sequences are currently running
+    TerminateSequence();
+
     //Reload the files and update the dropdown menu in the UI
     SequencesManager->LoadSequencesInFolder(DEFAULT_CONFIG_DIRECTORY);
     GenerateSettingsFile();
@@ -127,10 +127,11 @@ void RotationTrainer::ReloadSequenceFiles()
 // TICK //
 void RotationTrainer::Tick(CanvasWrapper Canvas)
 {
-    if(!*enabled || gameWrapper->IsInOnlineGame()) { return; }
-
-    //Handles both the collision checking and rendering
-    SequencesManager->TickSequence(Canvas, GetCurrentGameState());
+    if(*bEnabled && gameWrapper->IsInFreeplay())
+    {
+        //Handles both the collision checking and rendering
+        SequencesManager->TickSequence(Canvas, GetCurrentGameState());
+    }
 }
 
 

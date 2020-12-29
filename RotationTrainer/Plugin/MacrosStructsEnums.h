@@ -6,12 +6,12 @@
 #include <memory>
 
 
+//Useful for logging in any of the classes
 extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 
 
 // MACROS //
 #define CVAR_ENABLED               "Rotation_Enabled"
-#define CVAR_RENDER_TYPE           "Rotation_RenderType"
 #define CVAR_SEQUENCE_NAME         "Rotation_SequenceName"
 #define NOTIFIER_SEQUENCE_LOADALL  "Rotation_LoadAllSequences"
 #define NOTIFIER_SEQUENCE_START    "Rotation_StartSequence"
@@ -19,7 +19,6 @@ extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 #define NOTIFIER_SEQUENCE_PREVIOUS "Rotation_PreviousSequence"
 #define NOTIFIER_SEQUENCE_NEXT     "Rotation_NextSequence"
 #define NOTIFIER_GET_START_INFO    "Rotation_GetStartPointInfo"
-
 #define DEFAULT_CONFIG_DIRECTORY   gameWrapper->GetDataFolder() / "RotationTrainer" / "Sequences"
 
 
@@ -116,9 +115,4 @@ struct CarLocations
 	Vector CurrentLocation;
 	UniqueIDWrapper PlayerID;
 	bool bHasNowAndLast = false; //don't check the current minus last location on the first tick that the object exists
-};
-
-struct LoadedSequence
-{
-	std::vector<std::shared_ptr<class Checkpoint>> checkpoints;
 };

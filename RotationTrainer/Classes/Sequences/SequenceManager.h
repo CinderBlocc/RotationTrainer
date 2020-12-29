@@ -52,5 +52,8 @@ private:
     void RenderCheckpoints(CanvasWrapper Canvas);
     void RenderHUD(CanvasWrapper Canvas);
 
+    void ClampMaxBoost();
+    void LockBallPosition(BallWrapper Ball);
+
     std::vector<std::string> CheckpointNames;
 };

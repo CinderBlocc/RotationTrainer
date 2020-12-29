@@ -44,16 +44,39 @@ void SequenceManager::StartSequence(const std::string& InSequenceName)
     //If the CurrentSequence is valid, start the sequence
     if(CurrentSequence)
     {
+        //Apply the starting properties
+        CarWrapper Car = gameWrapper->GetLocalCar();
+        if(!Car.IsNull())
+        {
+            const SequenceProperties& Properties = CurrentSequence->GetProperties();
+            
+            if(Properties.bSetStartBoost)
+            {
+                BoostWrapper Boost = Car.GetBoostComponent();
+                if(!Boost.IsNull())
+                {
+                    Boost.SetCurrentBoostAmount(Properties.StartBoostAmount / 100.f);
+                }
+            }
+
+            if(Properties.bSetStartPosition)
+            {
+                Car.SetVelocity(Vector(0, 0, 0));
+                Car.SetLocation(Properties.StartPosition);
+            }
+
+            if(Properties.bSetStartRotation)
+            {
+                Car.SetAngularVelocity(Vector(0, 0, 0), false);
+                Car.SetCarRotation(Properties.StartRotation);
+            }
+        }
+
+        //Start the sequence
         bIsSequenceActive = true;
         bEnabled = true;
         Timer.StopTimer();
         Timer.ResetTimer();
-
-        /*
-        
-            APPLY THE SEQUENCE PROPERTIES HERE
-        
-        */
     }
 }
 
@@ -124,8 +147,9 @@ void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
     {
         CheckpointNames.clear();
 
-        if(bIsSequenceActive)
+        if(CurrentSequence && bIsSequenceActive)
         {
+            ClampMaxBoost();
             CheckCollisions(Server);
             RenderCheckpoints(Canvas);
         }
@@ -134,8 +158,26 @@ void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
     }
 }
 
+void SequenceManager::ClampMaxBoost()
+{
+    const SequenceProperties& Properties = CurrentSequence->GetProperties();
+    if(!Properties.bSetMaxBoost) { return; }
+    CarWrapper Car = gameWrapper->GetLocalCar();
+    if(Car.IsNull()) { return; }
+    BoostWrapper Boost = Car.GetBoostComponent();
+    if(Boost.IsNull()) { return; }
+
+    float NewMax = Properties.MaxBoostAmount / 100.f;
+    Boost.SetCurrentBoostAmount(min(Boost.GetCurrentBoostAmount(), NewMax));
+}
+
 void SequenceManager::CheckCollisions(ServerWrapper Server)
 {
+    if(!CurrentSequence)
+    {
+        return;
+    }
+
     //Get ball
     if(Server.IsNull()) return;
     BallWrapper Ball = Server.GetBall();
@@ -159,10 +201,7 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
         //Freeze the ball unless it is the current target
         if(ThisCheckpoint->GetName() != "Ball")
         {
-            Ball.SetLocation(Vector(0, 0, 93.2f));
-            Ball.SetRotation(Rotator(0,0,0));
-            Ball.SetVelocity(Vector(0,0,0));
-            Ball.SetAngularVelocity(Vector(0,0,0), false);
+            LockBallPosition(Ball);
         }
 
         if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))
@@ -178,14 +217,27 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
             ++CurrentSequenceStep;
             if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
             {
-                TryNextSubsequence();
+                TryNextSubsequence();                                           // Do something different if the sequence ends with the ball
             }
         }
     }
 }
 
+void SequenceManager::LockBallPosition(BallWrapper Ball)
+{
+    Ball.SetLocation(Vector(0, 0, 93.2f));
+    Ball.SetRotation(Rotator(0,0,0));
+    Ball.SetVelocity(Vector(0,0,0));
+    Ball.SetAngularVelocity(Vector(0,0,0), false);
+}
+
 void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
 {
+    if(!CurrentSequence)
+    {
+        return;
+    }
+
     float AnimTime = clock() / 1000.f;
 
     CameraWrapper Camera = gameWrapper->GetCamera();
@@ -214,6 +266,11 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
 
 void SequenceManager::RenderHUD(CanvasWrapper Canvas)
 {
+    if(!CurrentSequence)
+    {
+        return;
+    }
+
     //Draw the clock
     Timer.DrawTimer(Canvas);
 
