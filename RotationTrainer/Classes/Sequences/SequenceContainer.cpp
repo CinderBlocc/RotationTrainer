@@ -224,6 +224,9 @@ void SequenceContainer::AddIndividualSequence(std::ifstream& InFile, const std::
             continue;
         }
 
+        //Capitalize all letters in string
+        for(char& c : LineOfText) { c = toupper(c); }
+
         //Check if the line matches one of the checkpoint codes
         if(auto ThisCheckpoint = FindDefaultCheckpoint(LineOfText))
         {
@@ -292,34 +295,42 @@ void SequenceContainer::CompletePendingNestedSequenceRequests()
 // Custom checkpoints //
 std::shared_ptr<Checkpoint> SequenceContainer::MakeCustomCheckpoint(const std::string& InLine)
 {
-    //Format: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
+    //Format: CUSTOM(X, Y, Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
     //Values do not need to be in any particular order
 
-    std::shared_ptr<LocationCheckpoint> Output = nullptr;
-    bool bSuccessfullyCreated = false;
+    //At a minimum the location must be provided
+    std::vector<float> LocationVals = GetValuesFromParameter(InLine, "CUSTOM");
+    if(LocationVals.size() < 3)
+    {
+        return nullptr;
+    }
 
-    //If location is properly set, set bSuccessfullyCreated to true
-    Vector SpecifiedLocation;
+    //Create default values for the checkpoint
+    Vector SpecifiedLocation = {LocationVals.at(0), LocationVals.at(1), LocationVals.at(2)};
     float SpecifiedRadius = 200.f;
     int SpecifiedBoostSet = -1;
 
-    /*
-    
-        PARSE LINE HERE
-    
-    */
-
-    if(bSuccessfullyCreated)
+    //Get radius
+    std::vector<float> RadiusVal = GetValuesFromParameter(InLine, "RADIUS");
+    if(!RadiusVal.empty())
     {
-        Output = std::make_shared<LocationCheckpoint>(SpecifiedLocation, SpecifiedRadius, SpecifiedBoostSet);
+        SpecifiedRadius = RadiusVal.at(0);
     }
 
-    return Output;
+    //Get boost set amount
+    std::vector<float> BoostSetVal = GetValuesFromParameter(InLine, "BOOSTSET");
+    if(!RadiusVal.empty())
+    {
+        SpecifiedBoostSet = static_cast<int>(BoostSetVal.at(0));
+    }
+
+    //Create the checkpoint if at minimum the location was provided
+    return std::make_shared<LocationCheckpoint>(SpecifiedLocation, SpecifiedRadius, SpecifiedBoostSet);
 }
 
 std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::string& InLine)
 {
-    //Format: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))> - brackets indicate optional value
+    //Format: DEMOCAR(X, Y, Z) <ROTATION(P, Y, R (in degrees))> - brackets indicate optional value
     //Values do not need to be in any particular order
     
     std::shared_ptr<DemoCarCheckpoint> Output = nullptr;
@@ -338,6 +349,48 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::
     if(bSuccessfullyCreated)
     {
         Output = std::make_shared<DemoCarCheckpoint>(SpecifiedLocation, SpecifiedRotation);
+    }
+
+    return Output;
+}
+
+std::vector<float> SequenceContainer::GetValuesFromParameter(const std::string& LineToSearch, const std::string& SearchTerm)
+{
+    std::vector<float> Output;
+
+    // SEARCHTERM(var, var, var, var, etc) //
+
+    //Look for search term in line of text
+    size_t SearchResult = LineToSearch.find(SearchTerm);
+    if(SearchResult != std::string::npos)
+    {
+        //Get the first opening parentheses after SearchTerm
+        size_t SearchResultEnd = SearchResult + SearchTerm.size();
+        if(SearchResultEnd < LineToSearch.size() && LineToSearch.at(SearchResultEnd) == '(')
+        {
+            //Find the first closing parentheses
+            size_t CloseParenthesesPos = LineToSearch.find(')', SearchResultEnd);
+            if(CloseParenthesesPos != std::string::npos)
+            {
+                size_t ContentsSize = CloseParenthesesPos - SearchResultEnd;
+                std::string Contents = LineToSearch.substr(SearchResultEnd + 1, ContentsSize - 1);
+                std::vector<std::string> SplitStrings;
+                split(Contents, SplitStrings, ',');
+
+                //Convert the comma separated values into floats
+                for(const auto& SplitString : SplitStrings)
+                {
+                    try
+                    {
+                        Output.push_back(stof(SplitString));
+                    }
+                    catch(...)
+                    {
+                    	cvarManagerGlobal->log("stof threw an exception on line: " + LineToSearch);
+                    }
+                }
+            }
+        }
     }
 
     return Output;

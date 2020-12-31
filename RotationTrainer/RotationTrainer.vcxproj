@@ -78,6 +78,7 @@
     <ClCompile Include="Classes\Checkpoints\BallCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\BoostCheckpoints.cpp" />
     <ClCompile Include="Classes\Checkpoints\Checkpoint.cpp" />
+    <ClCompile Include="Classes\Checkpoints\DemoCarCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\LocationCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\PostCheckpoint.cpp" />
     <ClCompile Include="Classes\Sequences\NestedSequence.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="Classes\Checkpoints\BallCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\BoostCheckpoints.h" />
     <ClInclude Include="Classes\Checkpoints\Checkpoint.h" />
+    <ClInclude Include="Classes\Checkpoints\DemoCarCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\LocationCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\PostCheckpoint.h" />
     <ClInclude Include="Classes\Sequences\NestedSequence.h" />

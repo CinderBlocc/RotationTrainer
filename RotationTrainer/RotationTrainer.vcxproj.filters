@@ -129,6 +129,9 @@
     <ClCompile Include="Classes\Sequences\SequenceTimer.cpp">
       <Filter>Classes\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="Classes\Checkpoints\DemoCarCheckpoint.cpp">
+      <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="Classes\Sequences\SequenceTimer.h">
       <Filter>Classes\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Checkpoints\DemoCarCheckpoint.h">
+      <Filter>Classes\Checkpoints</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
