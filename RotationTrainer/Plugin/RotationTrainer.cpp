@@ -10,25 +10,21 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
     - CUSTOM LOCATIONS    ***SequenceContainer.cpp, SequenceManager.cpp (for spawning demo car)***
     - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
         - Formatting: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))>
-    - Have more locations players can go. Use LocationType::LT_CUSTOM_LOCATION or LocationType::LT_BOOST_SETTER - BoostSetter is an extension of CustomLocation
-        - Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
-            - Formatting: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
-
-
-    - Skipping checkpoints    ***SequenceManager.cpp***
-        - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
-        - Display a red "Skipped X Checkpoints" below the clock. Add that to the record after the sequence is done
-            - Sort by time in the file, but show how many checkpoints were skipped next to the time
 
 
     - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
         - Store (in a single file) a list of the local player's current bests for any sequence they've completed
         - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
         - Store the top 5 times for each sequence?
+            - Sort by time, but show how many checkpoints were skipped next to the time
+        - Read the file and store ALL times in a data struct so you can sort the new time in easily
+            - Then completely overwrite the file
 */
 
+//Used for logging in any file that #includes MacrosStructsEnums (where this is extern declared)
 std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 
+// PLUGIN BOILERPLATE //
 void RotationTrainer::onLoad()
 {
     cvarManagerGlobal = cvarManager;
@@ -127,8 +123,7 @@ void RotationTrainer::OnDelayChanged()
 
 void RotationTrainer::OnGoalScored()
 {
-    //End any active sequences. If a sequence was active, mark it as completed to save personal best
-    EndSequence(SequencesManager->IsSequenceActive());
+    SequencesManager->OnGoalScored();
 
     //Queue up the next subsequence to start when the goal replay is done
     if(IsValidMode())

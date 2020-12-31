@@ -1,14 +1,16 @@
 #include "LocationCheckpoint.h"
 #include "RenderingTools.h"
 
-LocationCheckpoint::LocationCheckpoint(Vector InLocation, float InRadius, int InBoostSetAmount)
-    : Checkpoint(ELocationType::LT_CUSTOM_LOCATION, ELocation::LOC_DEFAULT, "LOCATION", "LOCATION"),
+LocationCheckpoint::LocationCheckpoint(std::string InName, Vector InLocation, float InRadius, int InBoostSetAmount)
+    : Checkpoint(ELocationType::LT_CUSTOM_LOCATION, ELocation::LOC_DEFAULT, "LOCATION", InName),
     LocationVec(InLocation),
     CircleRadius(InRadius),
     BoostSetAmount(InBoostSetAmount)
 {
-    //CALCULATE ALL OF THESE RELATIVE TO THE RADIUS
+    //Default height
     CylinderHeight = 200;
+
+    //CALCULATE ALL OF THESE RELATIVE TO THE RADIUS
     ConeMinHeight = CircleRadius * 3;
     ConeMaxHeight = ConeMinHeight + (CircleRadius / 2);
     ConeSize = ConeMinHeight / 100;

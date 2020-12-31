@@ -11,7 +11,7 @@ class DemoCarCheckpoint : public LocationCheckpoint
 {
 public:
     DemoCarCheckpoint() = delete;
-    DemoCarCheckpoint(Vector InLocation, Rotator InRotation);
+    DemoCarCheckpoint(std::string InName, Vector InLocation, Rotator InRotation);
 
     //When the sequence gets to one of these checkpoints, it should check if the checkpoint is revealed
     //If it isn't revealed yet, spawn the car

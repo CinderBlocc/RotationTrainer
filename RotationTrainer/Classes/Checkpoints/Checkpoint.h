@@ -21,6 +21,7 @@ public:
 
     std::string GetCode() { return Code; }
     std::string GetName() { return Name; }
+    ELocationType GetLocationType() { return LocationType; }
 
 protected:
     ELocationType LocationType;

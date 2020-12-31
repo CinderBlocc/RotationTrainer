@@ -15,12 +15,6 @@
 #include <iterator>
 #include <sstream>
 
-/*
-
-    Need to add the CUSTOM and DEMOCAR checkpoint implementations
-
-*/
-
 SequenceContainer::SequenceContainer()
 {
     FillDefaultCheckpoints();
@@ -319,13 +313,16 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeCustomCheckpoint(const std::s
 
     //Get boost set amount
     std::vector<float> BoostSetVal = GetValuesFromParameter(InLine, "BOOSTSET");
-    if(!RadiusVal.empty())
+    if(!BoostSetVal.empty())
     {
         SpecifiedBoostSet = static_cast<int>(BoostSetVal.at(0));
     }
 
+    //Get the name of this checkpoint. Defaults to UNNAMED LOCATION
+    std::string SpecifiedName = GetNameFromCustomCheckpoint(InLine, false);
+
     //Create the checkpoint if at minimum the location was provided
-    return std::make_shared<LocationCheckpoint>(SpecifiedLocation, SpecifiedRadius, SpecifiedBoostSet);
+    return std::make_shared<LocationCheckpoint>(SpecifiedName, SpecifiedLocation, SpecifiedRadius, SpecifiedBoostSet);
 }
 
 std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::string& InLine)
@@ -333,25 +330,34 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::
     //Format: DEMOCAR(X, Y, Z) <ROTATION(P, Y, R (in degrees))> - brackets indicate optional value
     //Values do not need to be in any particular order
     
-    std::shared_ptr<DemoCarCheckpoint> Output = nullptr;
-    bool bSuccessfullyCreated = false;
-
-    //If location is properly set, set bSuccessfullyCreated to true
-    Vector SpecifiedLocation;
-    Rotator SpecifiedRotation = {0, 0, 0};
-
-    /*
-    
-        PARSE LINE HERE
-    
-    */
-
-    if(bSuccessfullyCreated)
+    //At a minimum the location must be provided
+    std::vector<float> LocationVals = GetValuesFromParameter(InLine, "DEMOCAR");
+    if(LocationVals.size() < 3)
     {
-        Output = std::make_shared<DemoCarCheckpoint>(SpecifiedLocation, SpecifiedRotation);
+        return nullptr;
     }
 
-    return Output;
+    //Create default values for the checkpoint
+    Vector SpecifiedLocation = {LocationVals.at(0), LocationVals.at(1), LocationVals.at(2)};
+    Rotator SpecifiedRotation = {0, 0, 0};
+
+    //Get rotation
+    std::vector<float> RotationVals = GetValuesFromParameter(InLine, "ROTATION");
+    if(RotationVals.size() >= 3)
+    {
+        SpecifiedRotation =
+        {
+            static_cast<int>(RotationVals.at(0) * CONST_DegToUnrRot),
+            static_cast<int>(RotationVals.at(1) * CONST_DegToUnrRot),
+            static_cast<int>(RotationVals.at(2) * CONST_DegToUnrRot)
+        };
+    }
+
+    //Get the name of this checkpoint. Defaults to UNNAMED DEMO CAR
+    std::string SpecifiedName = GetNameFromCustomCheckpoint(InLine, true);
+
+    //Create the checkpoint if at minimum the location was provided
+    return std::make_shared<DemoCarCheckpoint>(SpecifiedName, SpecifiedLocation, SpecifiedRotation);
 }
 
 std::vector<float> SequenceContainer::GetValuesFromParameter(const std::string& LineToSearch, const std::string& SearchTerm)
@@ -389,6 +395,32 @@ std::vector<float> SequenceContainer::GetValuesFromParameter(const std::string& 
                     	cvarManagerGlobal->log("stof threw an exception on line: " + LineToSearch);
                     }
                 }
+            }
+        }
+    }
+
+    return Output;
+}
+
+std::string SequenceContainer::GetNameFromCustomCheckpoint(const std::string& LineToSearch, bool bIsDemoCar)
+{
+    std::string Output = bIsDemoCar ? "UNNAMED DEMO CAR" : "UNNAMED LOCATION";
+
+    //Look for search term in line of text
+    static const std::string SearchTerm = "NAME";
+    size_t SearchResult = LineToSearch.find(SearchTerm);
+    if(SearchResult != std::string::npos)
+    {
+        //Get the first opening parentheses after SearchTerm
+        size_t SearchResultEnd = SearchResult + SearchTerm.size();
+        if(SearchResultEnd < LineToSearch.size() && LineToSearch.at(SearchResultEnd) == '(')
+        {
+            //Find the first closing parentheses
+            size_t CloseParenthesesPos = LineToSearch.find(')', SearchResultEnd);
+            if(CloseParenthesesPos != std::string::npos)
+            {
+                size_t ContentsSize = CloseParenthesesPos - SearchResultEnd;
+                Output = LineToSearch.substr(SearchResultEnd + 1, ContentsSize - 1);
             }
         }
     }

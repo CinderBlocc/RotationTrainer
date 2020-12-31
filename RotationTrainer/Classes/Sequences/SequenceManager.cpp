@@ -5,19 +5,17 @@
 #include "NestedSequence.h"
 #include "IndividualSequence.h"
 #include "Checkpoints/Checkpoint.h"
+#include "Checkpoints/DemoCarCheckpoint.h"
 #include "RenderingTools.h"
 
 /*
 
+    Need to do the DemoCar reveal check and SpawnCar thing somewhere
+        - Do this in collision check once you have it checking collisions for all rendered checkpoints
+
     Handle personal bests writing in EndSequence?
         If you do that, you'll have to ensure the bests are only saved if the sequence was completed
         Don't want people skipping through sequences and getting insane bests
-
-
-    Need to do the DemoCar reveal check and SpawnCar thing somewhere
-
-
-    Need to check collisions in all the checkpoints that are being rendered
 
 */
 using namespace std::chrono;
@@ -31,6 +29,7 @@ void SequenceManager::StartSequence(const std::string& InSequenceName, bool bRes
     EndSequence(false);
     bSuccessfullyCompleted = false;
     bPendingNextSubsequence = false;
+    SkippedSteps = 0;
     Timer.ResetTimer();
 
     //Choose whether to restart the current subsequence, or the whole nested sequence
@@ -104,6 +103,7 @@ void SequenceManager::StartCurrentSequence()
 
 void SequenceManager::EndSequence(bool bCompleted)
 {
+    ClearAllBots();
     bIsSequenceActive = false;
     bIsTimerActive = false;
     CurrentSequence = nullptr;
@@ -146,6 +146,73 @@ void SequenceManager::ResetAllCheckpoints()
     }
 }
 
+void SequenceManager::ClearAllBots()
+{
+    /*
+    
+        IF ADDED TO THE SDK:
+
+        ArrayWrapper<ControllerWrapper> Players = Server.GetPlayers();
+        bool bClearedBots = false;
+        while(!bClearedBots)
+        {
+            bClearedBots = true;
+            for(int i = 0; i < Players.Count(); ++i)
+            {
+                if(ControllerWrapper ThisPlayer = PlayersGet(i))
+                {
+                    PlayerReplicationInfoWrapper PRI = ThisPlayer.GetPlayerReplicationInfo();
+                    if(!PRI.IsNull() && PRI.GetbBot())
+                    {
+                        bClearedBots = false;
+                        Server.RemovePlayer(ThisPlayer);
+                    }
+                }
+            }
+        }
+    
+    */
+
+    ServerWrapper Server = GetCurrentGameState();
+    if(Server.IsNull()) { return; }
+    PlayerControllerWrapper PCW = gameWrapper->GetPlayerController();
+    if(PCW.IsNull()) { return; }
+    PriWrapper MyPRI = PCW.GetPRI();
+    if(MyPRI.IsNull()) { return; }
+
+    ArrayWrapper<PriWrapper> PRIs = Server.GetPRIs();
+    for(int i = 0; i < PRIs.Count(); ++i)
+    {
+        PriWrapper ThisPRI = PRIs.Get(i);
+        if(!ThisPRI.IsNull() && ThisPRI.memory_address != MyPRI.memory_address)
+        {
+            cvarManagerGlobal->log("Removing car: " + std::to_string(i));
+            CarWrapper ThisCar = ThisPRI.GetCar();
+            if(!ThisCar.IsNull())
+            {
+                Server.RemoveCar(ThisCar);
+                ThisCar.Destroy();
+            }
+            Server.RemovePRI(ThisPRI);
+            Server.HandlePlayerRemoved(Server, ThisPRI);
+        }
+    }
+
+    //CarWrapper LocalCar = gameWrapper->GetLocalCar();
+    //if(LocalCar.IsNull()) { return; }
+    //ArrayWrapper<CarWrapper> Cars = Server.GetCars();
+    //for(int i = 0; i < Cars.Count(); ++i)
+    //{
+    //    CarWrapper Car = Cars.Get(i);
+    //    if(Car.IsNull()) { continue; }
+    //    if(Car.memory_address != LocalCar.memory_address)
+    //    {
+    //        Server.RemoveCar(Car);
+    //        Car.Destroy();
+    //    }
+    //}
+}
+
 void SequenceManager::TryNextSubsequence(bool bEndCurrentSequence)
 {
     if(!bPendingNextSubsequence)
@@ -159,10 +226,36 @@ void SequenceManager::TryNextSubsequence(bool bEndCurrentSequence)
     }
 
     //Try loading the next subsequence
-    if(CurrentMainSequence && CurrentMainSequence->bIsNested)
+    if(CurrentMainSequence)
     {
-        ++CurrentNestedSequenceStep;
-        StartSequence(CurrentMainSequenceName, false);
+        if(CurrentMainSequence->bIsNested)
+        {
+            ++CurrentNestedSequenceStep;
+
+            //Check if there is another subsequence to go to
+            auto ThisNest = std::static_pointer_cast<NestedSequence>(CurrentMainSequence);
+            if(ThisNest->GetSubsequence(CurrentNestedSequenceStep))
+            {
+                StartSequence(CurrentMainSequenceName, false);
+            }
+            else
+            {
+                Disable();
+            }
+        }
+        else
+        {
+            Disable();
+        }
+    }
+}
+
+void SequenceManager::OnGoalScored()
+{
+    if(IsSequenceActive())
+    {
+        SkippedSteps += (static_cast<int>(CurrentSequence->GetSequenceSize()) - CurrentSequenceStep - 1);
+        EndSequence(true);
     }
 }
 
@@ -173,6 +266,7 @@ void SequenceManager::Disable()
     CurrentMainSequence = nullptr;
     CurrentMainSequenceName = "";
     CurrentNestedSequenceStep = 0;
+    SkippedSteps = 0;
     EndSequence(false);
 }
 
@@ -263,34 +357,67 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
     CarLine.LastLocation = CarLine.CurrentLocation;
     CarLine.CurrentLocation = LocalCar.GetLocation();
 
-    auto ThisCheckpoint = CurrentSequence->GetCheckpoint(CurrentSequenceStep);
-    if(ThisCheckpoint)
+    //Loop through all the visible checkpoints and check for collisions
+    bool bIsBallActive = false;
+    for(int i = 0; i < NumCheckpointsToDisplay; ++i)
     {
-        //Freeze the ball unless it is the current target
-        if(ThisCheckpoint->GetName() != "Ball")
+        if(CurrentSequenceStep + i < static_cast<int>(CurrentSequence->GetSequenceSize()))
         {
-            LockBallPosition(Ball);
-        }
-
-        if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))
-        {
-            //Start timer on first checkpoint collision
-            if(!bIsTimerActive)
+            if(auto ThisCheckpoint = CurrentSequence->GetCheckpoint(CurrentSequenceStep + i))
             {
-                bIsTimerActive = true;
-                Timer.ResetTimer();
-                Timer.StartTimer();
-            }
+                //Check if the ball is the one of the current checkpoints
+                if(ThisCheckpoint->GetName() == "Ball")
+                {
+                    bIsBallActive = true;
+                }
 
-            //Increment to next sequence step
-            ++CurrentSequenceStep;
-            if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
-            {
-                EndSequence(true);
-                bPendingNextSubsequence = true;
-                gameWrapper->SetTimeout(std::bind(&SequenceManager::TryNextSubsequence, this, false), NextSequenceDelay);
+                //Control what happens with the DemoCar checkpoint type
+                if(ThisCheckpoint->GetLocationType() == ELocationType::LT_DEMO_CAR)
+                {
+                    auto ThisDemoCar = std::static_pointer_cast<DemoCarCheckpoint>(ThisCheckpoint);
+                    
+                    //Spawn the car if it hasnt been spawned yet
+                    if(!ThisDemoCar->IsCheckpointRevealed())
+                    {
+                        ThisDemoCar->SpawnCar(Server);
+                    }
+
+                    //Lock the car in the specified position and rotation
+                    ThisDemoCar->SetSpawnedCarTransform(Server);
+                }
+
+                //Check if the car is intersecting with the checkpoint
+                if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))
+                {
+                    //Start timer on first checkpoint collision
+                    if(!bIsTimerActive)
+                    {
+                        bIsTimerActive = true;
+                        Timer.ResetTimer();
+                        Timer.StartTimer();
+                    }
+
+                    //Increment to next sequence step
+                    CurrentSequenceStep += (i + 1);
+                    SkippedSteps += i;
+                    if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
+                    {
+                        EndSequence(true);
+                        bPendingNextSubsequence = true;
+                        gameWrapper->SetTimeout(std::bind(&SequenceManager::TryNextSubsequence, this, false), NextSequenceDelay);
+                    }
+
+                    //Already collided. Don't need to check any more steps
+                    break;
+                }
             }
         }
+    }
+
+    //Lock the ball if it isn't one of the current checkpoints
+    if(!bIsBallActive)
+    {
+        LockBallPosition(Ball);
     }
 }
 
@@ -316,8 +443,8 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
     RT::Frustum Frustum(Canvas, Camera);
 
     //Need to draw from the back to the front.
-    //If drawing from front to back, and if the next point and the third point are the same,
-    //the third point would draw on top of the next point
+    //If drawing from front to back, and if the next point and another later point are the same,
+    //the later point would draw on top of the next point
     for(int i = NumCheckpointsToDisplay - 1; i >= 0; --i)
     {
         if(CurrentSequenceStep + i < static_cast<int>(CurrentSequence->GetSequenceSize()))
@@ -337,6 +464,18 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
 
 void SequenceManager::RenderHUD(CanvasWrapper Canvas)
 {
+    //Draw the number of skipped steps above the clock
+    if(SkippedSteps > 0)
+    {
+        Canvas.SetColor(LinearColor{255, 0, 0, 255});
+        std::string SkippedText = "Skipped " + std::to_string(SkippedSteps) + " checkpoints";
+        Vector2 CanvasSize = Canvas.GetSize();
+        Vector2F SkippedSize = Canvas.GetStringSize(SkippedText, 3, 3);
+        Vector2 SkippedPosition = {(CanvasSize.X / 2) - ((int)SkippedSize.X / 2), 90};
+        Canvas.SetPosition(SkippedPosition);
+        Canvas.DrawString(SkippedText, 3, 3, true);
+    }
+
     //Draw the clock
     Timer.DrawTimer(Canvas);
 
@@ -381,4 +520,14 @@ void SequenceManager::RenderHUD(CanvasWrapper Canvas)
             TextBase.Y += 30;
         }
     }
+}
+
+ServerWrapper SequenceManager::GetCurrentGameState()
+{
+    if(gameWrapper->IsInReplay())
+        return gameWrapper->GetGameEventAsReplay().memory_address;
+    else if(gameWrapper->IsInOnlineGame())
+        return gameWrapper->GetOnlineGame();
+    else
+        return gameWrapper->GetGameEventAsServer();
 }

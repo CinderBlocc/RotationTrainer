@@ -42,6 +42,7 @@ private:
     std::shared_ptr<Checkpoint> MakeCustomCheckpoint(const std::string& InLine);
     std::shared_ptr<Checkpoint> MakeDemoCarCheckpoint(const std::string& InLine);
     std::vector<float> GetValuesFromParameter(const std::string& LineToSearch, const std::string& SearchTerm);
+    std::string GetNameFromCustomCheckpoint(const std::string& LineToSearch, bool bIsDemoCar);
 
     //Default checkpoints
     void FillDefaultCheckpoints();

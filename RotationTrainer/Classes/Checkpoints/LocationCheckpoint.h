@@ -11,7 +11,7 @@ class LocationCheckpoint : public Checkpoint
 {
 public:
     LocationCheckpoint() = delete;
-    LocationCheckpoint(Vector InLocation, float InRadius, int InBoostSetAmount = -1);
+    LocationCheckpoint(std::string InName, Vector InLocation, float InRadius, int InBoostSetAmount = -1);
     LocationCheckpoint(Vector InLocation, float InCircleRadius, float InCylinderHeight, float InConeSize, float InConeMinHeight, float InConeMaxHeight, int InBoostSetAmount = -1);
 
     bool bDrawCircle = true;

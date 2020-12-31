@@ -1,8 +1,8 @@
 #include "DemoCarCheckpoint.h"
 #include "RenderingTools.h"
 
-DemoCarCheckpoint::DemoCarCheckpoint(Vector InLocation, Rotator InRotation)
-    : LocationCheckpoint(InLocation, 150), Rotation(InRotation)
+DemoCarCheckpoint::DemoCarCheckpoint(std::string InName, Vector InLocation, Rotator InRotation)
+    : LocationCheckpoint(InName, InLocation, 150), Rotation(InRotation)
 {
     LocationType = ELocationType::LT_DEMO_CAR;
     bDrawCircle = false;
@@ -53,7 +53,9 @@ void DemoCarCheckpoint::SpawnCar(ServerWrapper Server)
     }
 
     //23 is Octane
-    Server.SpawnCar(23, FinalCarName);
+    //Server.SpawnCar(23, FinalCarName);
+    Server.SpawnBot(23, FinalCarName);
+    SpawnedCarName = FinalCarName;
 
     bIsCheckpointRevealed = true;
 }

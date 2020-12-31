@@ -21,6 +21,7 @@ public:
     void EndSequence(bool bCompleted);
     void SetPendingNextSubsequence(bool bNewValue) { bPendingNextSubsequence = bNewValue; }
     void TryNextSubsequence(bool bEndCurrentSequence = true);
+    void OnGoalScored();
     void Disable();
 
     bool IsEnabled() { return bEnabled; }
@@ -53,6 +54,7 @@ private:
     bool bIsTimerActive = false;
     bool bPendingNextSubsequence = false;
     int CurrentSequenceStep = 0;
+    int SkippedSteps = 0;
     int CurrentNestedSequenceStep = 0;
     int NumCheckpointsToDisplay = 5;
     float NextSequenceDelay = 3.f;
@@ -60,8 +62,12 @@ private:
     bool bSuccessfullyCompleted = false;
     std::chrono::steady_clock::time_point TimeCompleted;
 
+    ServerWrapper GetCurrentGameState();
+
     void StartCurrentSequence();
     void ResetAllCheckpoints();
+
+    void ClearAllBots();
 
     void CheckCollisions(ServerWrapper Server);
     void RenderCheckpoints(CanvasWrapper Canvas);

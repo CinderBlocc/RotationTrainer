@@ -42,7 +42,6 @@ enum class ELocationType
 	LT_BALL,
     LT_DEMO_CAR,
     LT_CUSTOM_LOCATION,
-    LT_BOOST_SETTER,
 	LT_MAX
 };
 

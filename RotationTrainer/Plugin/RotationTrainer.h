@@ -16,6 +16,7 @@ private:
     std::shared_ptr<float> NextSequenceDelay;
 
 public:
+    //Plugin Boilerplate
 	void onLoad() override;
 	void onUnload() override;
 
