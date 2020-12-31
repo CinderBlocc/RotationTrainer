@@ -14,6 +14,7 @@ public:
     LocationCheckpoint(Vector InLocation, float InRadius, int InBoostSetAmount = -1);
     LocationCheckpoint(Vector InLocation, float InCircleRadius, float InCylinderHeight, float InConeSize, float InConeMinHeight, float InConeMaxHeight, int InBoostSetAmount = -1);
 
+    bool bDrawCircle = true;
     void Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, RT::Frustum InFrustum, float InSeconds) override;
     bool CheckCollision(CarWrapper InCar, CarLocations InCarLocations) override;
 

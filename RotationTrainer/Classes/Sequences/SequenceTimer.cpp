@@ -1,27 +1,19 @@
 #include "SequenceTimer.h"
 
-/*
-
-    Need to switch the timer count storage so it accumulates a delta each tick
-    This way you can pause the timer while the game is paused, and restarting it won't have a weird jump in time
-
-*/
-
 void SequenceTimer::StartTimer()
 {
-    StartTime = std::chrono::steady_clock::now();
+    PreviousTime = std::chrono::steady_clock::now();
     bIsTimerRunning = true;
 }
 
 void SequenceTimer::StopTimer()
 {
-    StoppedTime = GetTime();
     bIsTimerRunning = false;
 }
 
 void SequenceTimer::ResetTimer()
 {
-    StoppedTime = 0;
+    Time = 0;
 }
 
 bool SequenceTimer::GetbTimerRunning()
@@ -35,10 +27,14 @@ float SequenceTimer::GetTime()
 
     if(bIsTimerRunning)
     {
-        return duration_cast<duration<float>>(steady_clock::now() - StartTime).count();
+        auto CurrentTime = steady_clock::now();
+        float Delta = duration_cast<duration<float>>(CurrentTime - PreviousTime).count();
+        PreviousTime = CurrentTime;
+
+        Time += Delta;
     }
 
-    return StoppedTime;
+    return Time;
 }
 
 void SequenceTimer::DrawTimer(CanvasWrapper Canvas)

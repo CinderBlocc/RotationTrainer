@@ -8,10 +8,10 @@ LocationCheckpoint::LocationCheckpoint(Vector InLocation, float InRadius, int In
     BoostSetAmount(InBoostSetAmount)
 {
     //CALCULATE ALL OF THESE RELATIVE TO THE RADIUS
-    CylinderHeight;
-    ConeSize;
-    ConeMinHeight;
-    ConeMaxHeight;
+    CylinderHeight = 200;
+    ConeMinHeight = CircleRadius * 3;
+    ConeMaxHeight = ConeMinHeight + (CircleRadius / 2);
+    ConeSize = ConeMinHeight / 100;
 }
 
 LocationCheckpoint::LocationCheckpoint(Vector InLocation, float InCircleRadius, float InCylinderHeight, float InConeSize, float InConeMinHeight, float InConeMaxHeight, int InBoostSetAmount)
@@ -30,34 +30,37 @@ void LocationCheckpoint::Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, RT
     constexpr float RadsPerSec = 2 * CONST_PI_F;
 
 	//DRAW CIRCLE
-    //Create circle
-	RT::Circle IndicatorCircle(LocationVec, Quat(), CircleRadius);
-	IndicatorCircle.location.Z = 10; // Set floor height
+    if(bDrawCircle)
+    {
+        //Create circle
+	    RT::Circle IndicatorCircle(LocationVec, Quat(), CircleRadius);
+	    IndicatorCircle.location.Z = 10; // Set floor height
 	
-    //Calculate distance percentage for dynamic line thickness and circle steps
-	float DistancePercent = RT::GetVisualDistance(InCanvas, InFrustum, InCamera, IndicatorCircle.location);
-	IndicatorCircle.lineThickness = 10 * DistancePercent;
+        //Calculate distance percentage for dynamic line thickness and circle steps
+	    float DistancePercent = RT::GetVisualDistance(InCanvas, InFrustum, InCamera, IndicatorCircle.location);
+	    IndicatorCircle.lineThickness = 10 * DistancePercent;
 
-    //Clamping distance percent clamps the number of steps to max
-    constexpr int MinCircleSteps = 8;
-	constexpr int MaxCircleSteps = 80;
-    int CalculatedSteps = static_cast<int>(MaxCircleSteps * min(DistancePercent, 1));
-	IndicatorCircle.steps = max(CalculatedSteps, MinCircleSteps);
+        //Clamping distance percent clamps the number of steps to max
+        constexpr int MinCircleSteps = 8;
+	    constexpr int MaxCircleSteps = 80;
+        int CalculatedSteps = static_cast<int>(MaxCircleSteps * min(DistancePercent, 1));
+	    IndicatorCircle.steps = max(CalculatedSteps, MinCircleSteps);
 
-    //Draw original circle
-    RT::Matrix3 CircleMatrix(IndicatorCircle.orientation);
-	IndicatorCircle.orientation = RT::AngleAxisRotation((-RadsPerSec / 8) * InSeconds, CircleMatrix.up);
-    IndicatorCircle.DrawSegmented(InCanvas, InFrustum, 8, .5f);
+        //Draw original circle
+        RT::Matrix3 CircleMatrix(IndicatorCircle.orientation);
+	    IndicatorCircle.orientation = RT::AngleAxisRotation((-RadsPerSec / 8) * InSeconds, CircleMatrix.up);
+        IndicatorCircle.DrawSegmented(InCanvas, InFrustum, 8, .5f);
 
-    //Draw secondary circle spinning the opposite direction
-	if(LocationType == ELocationType::LT_LARGE_BOOST)
-	{
-		IndicatorCircle.radius *= .67f;
-		IndicatorCircle.location.Z += 25;
-		IndicatorCircle.orientation = RT::AngleAxisRotation((RadsPerSec / 8) * InSeconds, CircleMatrix.up);
+        //Draw secondary circle spinning the opposite direction
+	    if(LocationType == ELocationType::LT_LARGE_BOOST)
+	    {
+		    IndicatorCircle.radius *= .67f;
+		    IndicatorCircle.location.Z += 25;
+		    IndicatorCircle.orientation = RT::AngleAxisRotation((RadsPerSec / 8) * InSeconds, CircleMatrix.up);
 
-		IndicatorCircle.DrawSegmented(InCanvas, InFrustum, 8, .5f);
-	}
+		    IndicatorCircle.DrawSegmented(InCanvas, InFrustum, 8, .5f);
+	    }
+    }
 
 
 	//DRAW CONE

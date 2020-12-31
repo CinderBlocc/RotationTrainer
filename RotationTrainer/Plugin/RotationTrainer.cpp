@@ -6,21 +6,7 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 
 /*
     TO-DO
-
-    - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
-        - Store (in a single file) a list of the local player's current bests for any sequence they've completed
-        - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
-        - Store the top 5 times for each sequence?
     
-    - Pressing start doesn't stop timer    ***SequenceTimer.cpp***
-        - Use GameWrapper::IsPaused(). Would only work in freeplay or when a LAN host uses the admin pause feature
-        - Using accumulated deltas will fix the problem of time jumps after unpausing
-    
-    - Skipping checkpoints    ***SequenceManager.cpp***
-        - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
-        - Display a red "Skipped X Checkpoints" below the clock. Add that to the record after the sequence is done
-            - Sort by time in the file, but show how many checkpoints were skipped next to the time
-
     - CUSTOM LOCATIONS    ***SequenceContainer.cpp, SequenceManager.cpp (for spawning demo car)***
     - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
         - Formatting: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))>
@@ -28,9 +14,17 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
         - Could implement this (along with boost setter mentioned above) as just a custom location with radius specification
             - Formatting: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
 
-    - ***RotationTrainer.cpp, SequenceManager.cpp?***
-    - If a nested sequence's subsequence finishes with a ball, start the next subsequence when the goal replay is done
-        - If it ends with a normal checkpoint, use the delay value before starting the next subsequence
+
+    - Skipping checkpoints    ***SequenceManager.cpp***
+        - If you hit orange or red, skip sequence to that next checkpoint, and when you finish the set it tells you how many you missed. Could be toggleable.
+        - Display a red "Skipped X Checkpoints" below the clock. Add that to the record after the sequence is done
+            - Sort by time in the file, but show how many checkpoints were skipped next to the time
+
+
+    - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
+        - Store (in a single file) a list of the local player's current bests for any sequence they've completed
+        - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
+        - Store the top 5 times for each sequence?
 */
 
 std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
@@ -58,7 +52,9 @@ void RotationTrainer::onLoad()
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_NEXT,      [this](std::vector<std::string> params){/*PreviousOrNextSequence(false);*/}, "Start next sequence", PERMISSION_ALL);
     cvarManager->registerNotifier(NOTIFIER_GET_START_INFO,     [this](std::vector<std::string> params){GetStartPointInfo();}, "Log current car info to console to use for starting point", PERMISSION_ALL);
 
-    gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", std::bind(&RotationTrainer::TryNextSubsequence, this));
+    gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", std::bind(&RotationTrainer::OnGoalScored, this));
+    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.StartNewRound", std::bind(&RotationTrainer::OnNextRoundStarted, this));
+    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.Destroyed", std::bind(&RotationTrainer::TerminateSequence, this));
     gameWrapper->HookEventPost("Function TAGame.GameInfo_TA.PlayerResetTraining", std::bind(&RotationTrainer::RestartSequence, this));
 
     gameWrapper->RegisterDrawable(std::bind(&RotationTrainer::Tick, this, std::placeholders::_1));
@@ -69,32 +65,32 @@ void RotationTrainer::onUnload() {}
 
 
 // SEQUENCE CONTROL //
-void RotationTrainer::StartSequence()
+void RotationTrainer::StartSequence(bool bResetNestedSequenceStep)
 {
-    if(*bEnabled && gameWrapper->IsInFreeplay())
+    if(IsValidMode())
     {
-        SequencesManager->StartSequence(*SequenceName);
+        bPendingNextSubsequence = false;
+        SequencesManager->StartSequence(*SequenceName, bResetNestedSequenceStep);
     }
 }
 
-void RotationTrainer::EndSequence()
+void RotationTrainer::EndSequence(bool bCompleted)
 {
-    SequencesManager->EndSequence();
+    SequencesManager->EndSequence(bCompleted);
 }
 
 void RotationTrainer::TryNextSubsequence()
 {
-    //Ends the current sequence and tries starting the next subsequence if it is a nested sequence
     if(SequencesManager->IsSequenceActive())
     {
-        SequencesManager->EndSequence();
+        SequencesManager->EndSequence(false);
+    }
+    
+    if(IsValidMode())
+    {
+        SequencesManager->SetPendingNextSubsequence(true);
         SequencesManager->TryNextSubsequence();
     }
-}
-
-void RotationTrainer::OnDelayChanged()
-{
-    SequencesManager->SetNextSequenceDelay(cvarManager->getCvar(CVAR_NEXT_SEQUENCE_DELAY).getFloatValue());
 }
 
 void RotationTrainer::TerminateSequence()
@@ -106,10 +102,10 @@ void RotationTrainer::TerminateSequence()
 
 void RotationTrainer::RestartSequence()
 {
-    //Restart sequence on "reset training" button pressed
-    if(SequencesManager->IsSequenceActive())
+    //Restart current sequence on "reset training" button pressed
+    if(SequencesManager->IsEnabled())
     {
-        gameWrapper->SetTimeout(std::bind(&RotationTrainer::StartSequence, this), .001f);
+        gameWrapper->SetTimeout(std::bind(&RotationTrainer::StartSequence, this, false), .001f);
     }
 }
 
@@ -121,6 +117,37 @@ void RotationTrainer::ReloadSequenceFiles()
     //Reload the files and update the dropdown menu in the UI
     SequencesManager->LoadSequencesInFolder(DEFAULT_CONFIG_DIRECTORY);
     GenerateSettingsFile();
+}
+
+void RotationTrainer::OnDelayChanged()
+{
+    //This only works for sequences that end with a checkpoint and not with the ball
+    SequencesManager->SetNextSequenceDelay(cvarManager->getCvar(CVAR_NEXT_SEQUENCE_DELAY).getFloatValue());
+}
+
+void RotationTrainer::OnGoalScored()
+{
+    //End any active sequences. If a sequence was active, mark it as completed to save personal best
+    EndSequence(SequencesManager->IsSequenceActive());
+
+    //Queue up the next subsequence to start when the goal replay is done
+    if(IsValidMode())
+    {
+        bPendingNextSubsequence = true;
+    }
+}
+
+void RotationTrainer::OnNextRoundStarted()
+{
+    //Delay the start of the next sequence until the next tick so the game can get set up
+    gameWrapper->SetTimeout([this](GameWrapper* gw)
+    {
+        if(IsValidMode() && bPendingNextSubsequence)
+        {
+            TryNextSubsequence();
+            bPendingNextSubsequence = false;
+        }
+    }, 0.001f);
 }
 
 
@@ -144,6 +171,11 @@ ServerWrapper RotationTrainer::GetCurrentGameState()
         return gameWrapper->GetOnlineGame();
     else
         return gameWrapper->GetGameEventAsServer();
+}
+
+bool RotationTrainer::IsValidMode()
+{
+    return *bEnabled && gameWrapper->IsInFreeplay();
 }
 
 void RotationTrainer::GetStartPointInfo()

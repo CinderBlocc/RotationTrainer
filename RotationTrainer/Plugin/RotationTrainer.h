@@ -20,19 +20,23 @@ public:
 	void onUnload() override;
 
     //Sequence Control
-	void StartSequence();
-	void EndSequence();
+    bool bPendingNextSubsequence = false;
+	void StartSequence(bool bResetNestedSequenceStep = true);
+	void EndSequence(bool bCompleted);
     void TryNextSubsequence();
-    void OnDelayChanged();
 	void TerminateSequence();
 	void RestartSequence();
     void ReloadSequenceFiles();
+    void OnDelayChanged();
+    void OnGoalScored();
+    void OnNextRoundStarted();
 
     //Tick
 	void Tick(CanvasWrapper Canvas);
 
     //Miscellaneous
     ServerWrapper GetCurrentGameState();
+    bool IsValidMode();
 	void GetStartPointInfo();
 
     //UI (SettingsFileGenerator.cpp)

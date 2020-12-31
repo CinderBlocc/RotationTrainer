@@ -3,12 +3,14 @@
 #include "Checkpoints/BackboardCheckpoint.h"
 #include "Checkpoints/BallCheckpoint.h"
 #include "Checkpoints/BoostCheckpoints.h"
+#include "Checkpoints/DemoCarCheckpoint.h"
 #include "Checkpoints/PostCheckpoint.h"
 #include "Sequences/SequenceProperties.h"
 #include "Sequences/PendingNestedSequence.h"
 #include "Sequences/IndividualSequence.h"
 #include "Sequences/NestedSequence.h"
 #include "Sequences/Sequence.h"
+#include "utils/parser.h"
 #include <filesystem>
 #include <iterator>
 #include <sstream>
@@ -293,10 +295,26 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeCustomCheckpoint(const std::s
     //Format: CUSTOM(X Y Z) <RADIUS(float)> <BOOSTSET(int)> - brackets indicate optional value
     //Values do not need to be in any particular order
 
-    //If no RADIUS is supplied, give it a default radius of 200 or something between the small and big pad sizes
+    std::shared_ptr<LocationCheckpoint> Output = nullptr;
+    bool bSuccessfullyCreated = false;
 
-    //If the formatting is too wrong, return nullptr
-    return nullptr;
+    //If location is properly set, set bSuccessfullyCreated to true
+    Vector SpecifiedLocation;
+    float SpecifiedRadius = 200.f;
+    int SpecifiedBoostSet = -1;
+
+    /*
+    
+        PARSE LINE HERE
+    
+    */
+
+    if(bSuccessfullyCreated)
+    {
+        Output = std::make_shared<LocationCheckpoint>(SpecifiedLocation, SpecifiedRadius, SpecifiedBoostSet);
+    }
+
+    return Output;
 }
 
 std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::string& InLine)
@@ -304,8 +322,25 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::
     //Format: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))> - brackets indicate optional value
     //Values do not need to be in any particular order
     
-    //If the formatting is too wrong, return nullptr
-    return nullptr;
+    std::shared_ptr<DemoCarCheckpoint> Output = nullptr;
+    bool bSuccessfullyCreated = false;
+
+    //If location is properly set, set bSuccessfullyCreated to true
+    Vector SpecifiedLocation;
+    Rotator SpecifiedRotation = {0, 0, 0};
+
+    /*
+    
+        PARSE LINE HERE
+    
+    */
+
+    if(bSuccessfullyCreated)
+    {
+        Output = std::make_shared<DemoCarCheckpoint>(SpecifiedLocation, SpecifiedRotation);
+    }
+
+    return Output;
 }
 
 

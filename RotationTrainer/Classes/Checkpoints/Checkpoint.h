@@ -14,6 +14,8 @@ public:
     Checkpoint();//Need to keep default constructor for indirect derived classes
 	Checkpoint(ELocationType InLocationType, ELocation InLocation, std::string InCode, std::string InName);
 
+    virtual void ResetCheckpoint();
+
     virtual void Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, class RT::Frustum InFrustum, float InSeconds);
     virtual bool CheckCollision(CarWrapper InCar, CarLocations InCarLocations);
 

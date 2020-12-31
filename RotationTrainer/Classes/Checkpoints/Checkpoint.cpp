@@ -7,6 +7,12 @@ Checkpoint::Checkpoint()
 Checkpoint::Checkpoint(ELocationType InLocationType, ELocation InLocation, std::string InCode, std::string InName)
 	: LocationType(InLocationType), Location(InLocation), Code(InCode), Name(InName) {}
 
+void Checkpoint::ResetCheckpoint()
+{
+    //do nothing in base class
+    //this is mostly meant for democar checkpoints and others if they need it
+}
+
 void Checkpoint::Draw(CanvasWrapper InCanvas, CameraWrapper InCamera, class RT::Frustum InFrustum, float InSeconds)
 {
     //do nothing in base class

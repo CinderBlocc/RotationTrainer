@@ -15,8 +15,9 @@ public:
     void DrawTimer(CanvasWrapper Canvas);
 
 private:
-    std::chrono::steady_clock::time_point StartTime;
-    float StoppedTime = 0;
+    std::chrono::steady_clock::time_point PreviousTime;
+
+    float Time = 0;
     bool bIsTimerRunning = false;
 
     std::string FormatClockNumber(int InNum);

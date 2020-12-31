@@ -13,16 +13,34 @@
         If you do that, you'll have to ensure the bests are only saved if the sequence was completed
         Don't want people skipping through sequences and getting insane bests
 
+
+    Need to do the DemoCar reveal check and SpawnCar thing somewhere
+
+
+    Need to check collisions in all the checkpoints that are being rendered
+
 */
+using namespace std::chrono;
 
 SequenceManager::SequenceManager(std::shared_ptr<GameWrapper> InGameWrapper)
     : gameWrapper(InGameWrapper), SequenceData(std::make_shared<SequenceContainer>()), CurrentSequence(nullptr) {}
 
-void SequenceManager::StartSequence(const std::string& InSequenceName)
+void SequenceManager::StartSequence(const std::string& InSequenceName, bool bResetNestedSequenceStep)
 {
-    CurrentNestedSequenceStep = 0;
+    //Reset the sequence
+    EndSequence(false);
+    bSuccessfullyCompleted = false;
+    bPendingNextSubsequence = false;
+    Timer.ResetTimer();
+
+    //Choose whether to restart the current subsequence, or the whole nested sequence
+    if(bResetNestedSequenceStep)
+    {
+        CurrentNestedSequenceStep = 0;
+    }
 
     //Get the CurrentSequence either directly, or from the NestedSequence subsequence index
+    CurrentMainSequenceName = InSequenceName;
     CurrentMainSequence = SequenceData->GetSequence(InSequenceName);
     if(CurrentMainSequence)
     {
@@ -43,12 +61,13 @@ void SequenceManager::StartSequence(const std::string& InSequenceName)
 
 void SequenceManager::StartCurrentSequence()
 {
-    CurrentSequenceStep = 0;
-
     if(!CurrentSequence)
     {
         return;
     }
+
+    CurrentSequenceName = CurrentSequence->Name;
+    ResetAllCheckpoints();
 
     //Apply the starting properties
     CarWrapper Car = gameWrapper->GetLocalCar();
@@ -81,16 +100,22 @@ void SequenceManager::StartCurrentSequence()
     //Start the sequence
     bIsSequenceActive = true;
     bEnabled = true;
-    Timer.StopTimer();
-    Timer.ResetTimer();
 }
 
-void SequenceManager::EndSequence()
+void SequenceManager::EndSequence(bool bCompleted)
 {
     bIsSequenceActive = false;
+    bIsTimerActive = false;
     CurrentSequence = nullptr;
+    CurrentSequenceName = "";
     CurrentSequenceStep = 0;
     Timer.StopTimer();
+
+    if(bCompleted)
+    {
+        bSuccessfullyCompleted = true;
+        TimeCompleted = steady_clock::now();
+    }
 
     /*
         
@@ -112,36 +137,43 @@ void SequenceManager::EndSequence()
     */
 }
 
-void SequenceManager::TryNextSubsequence()
+void SequenceManager::ResetAllCheckpoints()
 {
-    if(IsSequenceActive())
+    //Start from a clean slate
+    if(CurrentSequence)
     {
-        EndSequence();
+        CurrentSequence->ResetAllCheckpoints();
+    }
+}
+
+void SequenceManager::TryNextSubsequence(bool bEndCurrentSequence)
+{
+    if(!bPendingNextSubsequence)
+    {
+        return;
+    }
+
+    if(bEndCurrentSequence && IsSequenceActive())
+    {
+        EndSequence(false);
     }
 
     //Try loading the next subsequence
     if(CurrentMainSequence && CurrentMainSequence->bIsNested)
     {
         ++CurrentNestedSequenceStep;
-
-        //Cast main sequence to nested sequence and get its individual sequence at the currentNestedSequenceStep
-        auto ThisNest = std::static_pointer_cast<NestedSequence>(CurrentMainSequence);
-        CurrentSequence = ThisNest->GetSubsequence(CurrentNestedSequenceStep);
-
-        if(CurrentSequence)
-        {
-            StartCurrentSequence();
-        }
+        StartSequence(CurrentMainSequenceName, false);
     }
 }
 
 void SequenceManager::Disable()
 {
     bEnabled = false;
-    CurrentSequence = nullptr;
+    bPendingNextSubsequence = false;
     CurrentMainSequence = nullptr;
+    CurrentMainSequenceName = "";
     CurrentNestedSequenceStep = 0;
-    EndSequence();
+    EndSequence(false);
 }
 
 void SequenceManager::LoadSequencesInFolder(std::filesystem::path InDirectory)
@@ -157,10 +189,31 @@ const std::vector<std::string>& SequenceManager::GetSequenceFilenames()
 
 void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
 {
-    if(bEnabled && !gameWrapper->IsPaused())
+    if(!bEnabled)
     {
+        return;
+    }
+
+    if(gameWrapper->IsPaused())
+    {
+        //Pause timer if it is running
+        if(Timer.GetbTimerRunning() && bIsTimerActive)
+        {
+            Timer.StopTimer();
+        }
+    }
+    else
+    {
+        //Unpause timer if it is paused
+        if(!Timer.GetbTimerRunning() && bIsTimerActive)
+        {
+            Timer.StartTimer();
+        }
+
+        //Clear checkpoints here before RenderCheckpoints may or may not run
         CheckpointNames.clear();
 
+        //Handle rendering and collision checking
         if(CurrentSequence && bIsSequenceActive)
         {
             ClampMaxBoost();
@@ -168,6 +221,7 @@ void SequenceManager::TickSequence(CanvasWrapper Canvas, ServerWrapper Server)
             RenderCheckpoints(Canvas);
         }
 
+        //Render the HUD after RenderCheckpoints has filled the CheckpointNames vector
         RenderHUD(Canvas);
     }
 }
@@ -221,8 +275,9 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
         if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))
         {
             //Start timer on first checkpoint collision
-            if(!Timer.GetbTimerRunning())
+            if(!bIsTimerActive)
             {
+                bIsTimerActive = true;
                 Timer.ResetTimer();
                 Timer.StartTimer();
             }
@@ -231,8 +286,9 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
             ++CurrentSequenceStep;
             if(CurrentSequenceStep >= CurrentSequence->GetSequenceSize())
             {
-                EndSequence();
-                gameWrapper->SetTimeout(std::bind(&SequenceManager::TryNextSubsequence, this), NextSequenceDelay);
+                EndSequence(true);
+                bPendingNextSubsequence = true;
+                gameWrapper->SetTimeout(std::bind(&SequenceManager::TryNextSubsequence, this, false), NextSequenceDelay);
             }
         }
     }
@@ -284,6 +340,25 @@ void SequenceManager::RenderHUD(CanvasWrapper Canvas)
     //Draw the clock
     Timer.DrawTimer(Canvas);
 
+    //Draw the completed text below the clock
+    if(bSuccessfullyCompleted)
+    {
+        float CompletedDur = duration_cast<duration<float>>(steady_clock::now() - TimeCompleted).count();
+        if(CompletedDur > 5.f)
+        {
+            bSuccessfullyCompleted = false;
+        }
+
+        Canvas.SetColor(LinearColor{0, 255, 0, 255});
+        static const std::string CompletedText = "Completed!";
+        Vector2 CanvasSize = Canvas.GetSize();
+        Vector2F CompletedSize = Canvas.GetStringSize(CompletedText, 5, 5);
+        Vector2 CompletedPosition = {(CanvasSize.X / 2) - ((int)CompletedSize.X / 2), 180};
+        Canvas.SetPosition(CompletedPosition);
+        Canvas.DrawString(CompletedText, 5, 5, true);
+    }
+
+    //Draw active sequence HUD
     if(CurrentSequence)
     {
         //Draw the sequence title
