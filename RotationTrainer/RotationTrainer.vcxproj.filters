@@ -31,6 +31,9 @@
     <Filter Include="Libraries\RenderingTools\Extra">
       <UniqueIdentifier>{1c283c0f-6b56-4bad-b4a8-d543ca02d573}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\PersonalBests">
+      <UniqueIdentifier>{3dbf83db-2d88-456f-9c25-f9be6e006548}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.cpp">
@@ -131,6 +134,12 @@
     </ClCompile>
     <ClCompile Include="Classes\Checkpoints\DemoCarCheckpoint.cpp">
       <Filter>Classes\Checkpoints</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\PersonalBests\PersonalBestsManager.cpp">
+      <Filter>Classes\PersonalBests</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\PersonalBests\PersonalBestsClasses.cpp">
+      <Filter>Classes\PersonalBests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +247,12 @@
     </ClInclude>
     <ClInclude Include="Classes\Checkpoints\DemoCarCheckpoint.h">
       <Filter>Classes\Checkpoints</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\PersonalBests\PersonalBestsManager.h">
+      <Filter>Classes\PersonalBests</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\PersonalBests\PersonalBestsClasses.h">
+      <Filter>Classes\PersonalBests</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

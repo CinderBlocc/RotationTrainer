@@ -81,6 +81,8 @@
     <ClCompile Include="Classes\Checkpoints\DemoCarCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\LocationCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\PostCheckpoint.cpp" />
+    <ClCompile Include="Classes\PersonalBests\PersonalBestsManager.cpp" />
+    <ClCompile Include="Classes\PersonalBests\PersonalBestsClasses.cpp" />
     <ClCompile Include="Classes\Sequences\NestedSequence.cpp" />
     <ClCompile Include="Classes\Sequences\IndividualSequence.cpp" />
     <ClCompile Include="Classes\Sequences\PendingNestedSequence.cpp" />
@@ -117,6 +119,8 @@
     <ClInclude Include="Classes\Checkpoints\DemoCarCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\LocationCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\PostCheckpoint.h" />
+    <ClInclude Include="Classes\PersonalBests\PersonalBestsManager.h" />
+    <ClInclude Include="Classes\PersonalBests\PersonalBestsClasses.h" />
     <ClInclude Include="Classes\Sequences\NestedSequence.h" />
     <ClInclude Include="Classes\Sequences\IndividualSequence.h" />
     <ClInclude Include="Classes\Sequences\PendingNestedSequence.h" />

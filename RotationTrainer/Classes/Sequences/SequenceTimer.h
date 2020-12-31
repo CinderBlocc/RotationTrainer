@@ -19,6 +19,4 @@ private:
 
     float Time = 0;
     bool bIsTimerRunning = false;
-
-    std::string FormatClockNumber(int InNum);
 };
