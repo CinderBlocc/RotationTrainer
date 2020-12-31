@@ -6,10 +6,6 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 
 /*
     TO-DO
-    
-    - CUSTOM LOCATIONS    ***SequenceContainer.cpp, SequenceManager.cpp (for spawning demo car)***
-    - Have a demoable car in opponents net as a location to hit. Use LocationType::LT_DEMO_CAR
-        - Formatting: DEMOCAR(X Y Z) <ROTATION(P Y R (in degrees))>
 
 
     - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
@@ -19,6 +15,12 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
             - Sort by time, but show how many checkpoints were skipped next to the time
         - Read the file and store ALL times in a data struct so you can sort the new time in easily
             - Then completely overwrite the file
+
+
+    - DemoCar needs to have its bot removed when it is demolished
+        - Hook demo event to get car
+        - Get PRI from car (determine if bot and get name)
+            - If is bot and name contains DEMOCAR_BASE_NAME, RemovePlayer(car.GetAIController())
 */
 
 //Used for logging in any file that #includes MacrosStructsEnums (where this is extern declared)

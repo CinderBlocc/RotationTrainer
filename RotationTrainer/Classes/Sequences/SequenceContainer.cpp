@@ -327,6 +327,12 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeCustomCheckpoint(const std::s
 
 std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::string& InLine)
 {
+    #ifdef NO_DEMO_CAR
+    
+    return nullptr;
+    
+    #else
+    
     //Format: DEMOCAR(X, Y, Z) <ROTATION(P, Y, R (in degrees))> - brackets indicate optional value
     //Values do not need to be in any particular order
     
@@ -358,6 +364,8 @@ std::shared_ptr<Checkpoint> SequenceContainer::MakeDemoCarCheckpoint(const std::
 
     //Create the checkpoint if at minimum the location was provided
     return std::make_shared<DemoCarCheckpoint>(SpecifiedName, SpecifiedLocation, SpecifiedRotation);
+    
+    #endif
 }
 
 std::vector<float> SequenceContainer::GetValuesFromParameter(const std::string& LineToSearch, const std::string& SearchTerm)

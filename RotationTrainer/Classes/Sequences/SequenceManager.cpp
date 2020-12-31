@@ -10,9 +10,6 @@
 
 /*
 
-    Need to do the DemoCar reveal check and SpawnCar thing somewhere
-        - Do this in collision check once you have it checking collisions for all rendered checkpoints
-
     Handle personal bests writing in EndSequence?
         If you do that, you'll have to ensure the bests are only saved if the sequence was completed
         Don't want people skipping through sequences and getting insane bests
@@ -148,6 +145,7 @@ void SequenceManager::ResetAllCheckpoints()
 
 void SequenceManager::ClearAllBots()
 {
+    #ifndef NO_DEMO_CAR
     /*
     
         IF ADDED TO THE SDK:
@@ -211,6 +209,7 @@ void SequenceManager::ClearAllBots()
     //        Car.Destroy();
     //    }
     //}
+    #endif
 }
 
 void SequenceManager::TryNextSubsequence(bool bEndCurrentSequence)
@@ -371,6 +370,7 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
                     bIsBallActive = true;
                 }
 
+                #ifndef NO_DEMO_CAR
                 //Control what happens with the DemoCar checkpoint type
                 if(ThisCheckpoint->GetLocationType() == ELocationType::LT_DEMO_CAR)
                 {
@@ -385,6 +385,7 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
                     //Lock the car in the specified position and rotation
                     ThisDemoCar->SetSpawnedCarTransform(Server);
                 }
+                #endif
 
                 //Check if the car is intersecting with the checkpoint
                 if(ThisCheckpoint->CheckCollision(LocalCar, CarLine))

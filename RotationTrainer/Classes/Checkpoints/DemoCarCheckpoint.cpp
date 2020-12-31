@@ -15,7 +15,7 @@ void DemoCarCheckpoint::SpawnCar(ServerWrapper Server)
         return;
     }
 
-    static const std::string BaseCarName = "Demo Car";
+    static const std::string BaseCarName = DEMOCAR_BASE_NAME;
     std::string FinalCarName = BaseCarName;
 
     //Get list of car names currently on the field

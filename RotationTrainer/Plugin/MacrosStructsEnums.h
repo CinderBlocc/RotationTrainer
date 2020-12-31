@@ -6,6 +6,16 @@
 #include <memory>
 
 
+
+
+//Temporary definition to block broken DemoCar functionality.
+//Current issue: once a bot is spawned, it can't be removed.
+//Might be fixed in a future SDK update that would add RemovePlayer function to ServerWrapper.
+#define NO_DEMO_CAR
+
+
+
+
 //Useful for logging in any of the classes
 extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 
@@ -21,6 +31,7 @@ extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 #define NOTIFIER_SEQUENCE_NEXT     "Rotation_NextSequence"
 #define NOTIFIER_GET_START_INFO    "Rotation_GetStartPointInfo"
 #define DEFAULT_CONFIG_DIRECTORY   gameWrapper->GetDataFolder() / "RotationTrainer" / "Sequences"
+#define DEMOCAR_BASE_NAME          "Demo Car"
 
 
 // ENUMS //
