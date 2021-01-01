@@ -4,13 +4,6 @@
 
 BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_FREEPLAY)
 
-/*
-    TO-DO
-
-    - Remove all NO_DEMO_CAR ifdefs
-
-*/
-
 std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 std::shared_ptr<GameWrapper> gameWrapperGlobal;
 
@@ -157,8 +150,6 @@ void RotationTrainer::OnNextRoundStarted()
 
 void RotationTrainer::OnCarDemolished(CarWrapper Car, void* params, std::string funcName)
 {
-    #ifndef NO_DEMO_CAR
-
     if(!IsValidMode())
     {
         return;
@@ -178,8 +169,6 @@ void RotationTrainer::OnCarDemolished(CarWrapper Car, void* params, std::string 
 
         Server.RemovePlayer(AIController);
     }
-
-    #endif
 }
 
 

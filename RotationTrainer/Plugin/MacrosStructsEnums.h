@@ -6,16 +6,6 @@
 #include <memory>
 
 
-
-
-//Temporary definition to block broken DemoCar functionality.
-//Current issue: once a bot is spawned, it can't be removed.
-//Might be fixed in a future SDK update that would add RemovePlayer function to ServerWrapper.
-//#define NO_DEMO_CAR
-
-
-
-
 extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 extern std::shared_ptr<GameWrapper> gameWrapperGlobal;
 
