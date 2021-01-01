@@ -9,6 +9,8 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 
     - Create a good _Example.cfg and _ExampleNested.cfg with clear instructions
 
+    - Remove all NO_DEMO_CAR ifdefs
+
 */
 
 //Used for logging in any file that #includes MacrosStructsEnums (where this is extern declared)
