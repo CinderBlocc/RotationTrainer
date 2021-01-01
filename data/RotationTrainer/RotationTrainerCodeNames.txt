@@ -1,0 +1,51 @@
+Below is the code for each checkpoint to create a sequence.
+There is a picture to go along with this in the same folder.
+The ball is automatically appended as the final target in the sequence unless otherwise specified.
+
+//Backboard
+BL: Backboard Left
+BR: Backboard Right
+	
+//Post
+PL: Post Left
+PR: Post Right
+
+//Large Boosts
+BLBL: Boost Large Back Left
+BLBR: Boost Large Back Right
+BLML: Boost Large Midfield Left
+BLMR: Boost Large Midfield Right
+BLFL: Boost Large Front Left
+BLFR: Boost Large Front Right
+
+//Small Boosts
+BSBGLL: Boost Small Back Goal Line Left
+BSBGLC: Boost Small Back Goal Line Center
+BSBGLR: Boost Small Back Goal Line Right
+BSBGBL: Boost Small Back Goal Box Left
+BSBGBC: Boost Small Back Goal Box Center
+BSBGBR: Boost Small Back Goal Box Right
+BSBMFL: Boost Small Back Middle Far Left
+BSBMCL: Boost Small Back Middle Center Left
+BSBMCR: Boost Small Back Middle Center Right
+BSBMFR: Boost Small Back Middle Far Right
+BSBML: Boost Small Back Midfield Left
+BSBMC: Boost Small Back Midfield Center
+BSBMR: Boost Small Back Midfield Right
+								     
+BSML: Boost Small Midfield Left
+BSMR: Boost Small Midfield Right
+
+BSFMR: Boost Small Front Midfield Right
+BSFMC: Boost Small Front Midfield Center
+BSFML: Boost Small Front Midfield Left
+BSFMFR: Boost Small Front Middle Far Right
+BSFMCR: Boost Small Front Middle Center Right
+BSFMCL: Boost Small Front Middle Center Left
+BSFMFL: Boost Small Front Middle Far Left
+BSFGBR: Boost Small Front Goal Box Right
+BSFGBC: Boost Small Front Goal Box Center 
+BSFGBL: Boost Small Front Goal Box Left
+BSFGLR: Boost Small Front Goal Line Right
+BSFGLC: Boost Small Front Goal Line Center
+BSFGLL: Boost Small Front Goal Line Left
