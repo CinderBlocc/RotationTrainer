@@ -2,7 +2,7 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "utils/parser.h"
 
-
+// TIMER CLASS //
 TimerClass::TimerClass(float InTime)
     : Minutes(0), Seconds(0), Milliseconds(0)
 {
@@ -24,12 +24,12 @@ TimerClass::TimerClass(const std::string& InString)
     }
 }
 
-std::string TimerClass::PrintTime()
+std::string TimerClass::PrintTime() const
 {
     return FormatClockNumber(Minutes) + ":" + FormatClockNumber(Seconds) + ":" + FormatClockNumber(Milliseconds);
 }
 
-std::string TimerClass::FormatClockNumber(int InNum)
+std::string TimerClass::FormatClockNumber(int InNum) const
 {
     std::string Output;
     if(InNum < 10)
@@ -43,6 +43,7 @@ std::string TimerClass::FormatClockNumber(int InNum)
 
 
 
+// PERSONAL BEST CLASS //
 PersonalBest::PersonalBest(TimerClass InTimer, int InSkippedSteps)
     : Time(InTimer), SkippedSteps(InSkippedSteps) {}
 
@@ -75,7 +76,7 @@ PersonalBest::PersonalBest(const std::string& InString)
     }
 }
 
-std::string PersonalBest::PrintPersonalBest()
+std::string PersonalBest::PrintPersonalBest() const
 {
     std::string Output = Time.PrintTime();
     if(SkippedSteps > 0)
@@ -84,4 +85,37 @@ std::string PersonalBest::PrintPersonalBest()
     }
 
     return Output;
+}
+
+
+
+// SEQUENCE BEST LIST //
+std::string SequenceBestList::PrintBestsList(size_t MaxRecordsToPrint) const
+{
+    std::string Output = SequenceName;
+
+    auto SortedBests = GetSortedBests();
+
+    size_t NumPrinted = 0;
+    for(const auto& Best : SortedBests)
+    {
+        if(NumPrinted >= MaxRecordsToPrint)
+        {
+            break;
+        }
+
+        Output += '\n' + Best.PrintPersonalBest();
+        ++NumPrinted;
+    }
+
+    return Output;
+}
+
+std::vector<PersonalBest> SequenceBestList::GetSortedBests() const
+{
+    auto BestsCopy = Bests;
+
+    std::sort(BestsCopy.begin(), BestsCopy.end());
+
+    return BestsCopy;
 }

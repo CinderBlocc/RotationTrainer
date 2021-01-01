@@ -6,24 +6,23 @@
 #include "IndividualSequence.h"
 #include "Checkpoints/Checkpoint.h"
 #include "Checkpoints/DemoCarCheckpoint.h"
+#include "PersonalBests/PersonalBestsManager.h"
 #include "RenderingTools.h"
 
-/*
-
-    Handle personal bests writing in EndSequence?
-        If you do that, you'll have to ensure the bests are only saved if the sequence was completed
-        Don't want people skipping through sequences and getting insane bests
-
-*/
 using namespace std::chrono;
 
 SequenceManager::SequenceManager(std::shared_ptr<GameWrapper> InGameWrapper)
-    : gameWrapper(InGameWrapper), SequenceData(std::make_shared<SequenceContainer>()), CurrentSequence(nullptr) {}
+    : gameWrapper(InGameWrapper),
+    SequenceData(std::make_shared<SequenceContainer>()),
+    CurrentSequence(nullptr),
+    PersonalBestManager(std::make_shared<PersonalBestsManager>(InGameWrapper))
+{}
 
 void SequenceManager::StartSequence(const std::string& InSequenceName, bool bResetNestedSequenceStep)
 {
     //Reset the sequence
     EndSequence(false);
+    PersonalBestsForSequence.clear();
     bSuccessfullyCompleted = false;
     bPendingNextSubsequence = false;
     SkippedSteps = 0;
@@ -64,6 +63,7 @@ void SequenceManager::StartCurrentSequence()
 
     CurrentSequenceName = CurrentSequence->Name;
     ResetAllCheckpoints();
+    PersonalBestsForSequence = PersonalBestManager->GetBestTimesForSequence(CurrentSequenceName);
 
     //Apply the starting properties
     CarWrapper Car = gameWrapper->GetLocalCar();
@@ -100,6 +100,18 @@ void SequenceManager::StartCurrentSequence()
 
 void SequenceManager::EndSequence(bool bCompleted)
 {
+    if(bCompleted)
+    {
+        bSuccessfullyCompleted = true;
+        TimeCompleted = steady_clock::now();
+
+        //If this is a new personal best, write it in the list
+        PersonalBestManager->WriteRecord(CurrentSequenceName, Timer.GetTime(), SkippedSteps);
+    }
+
+    //Update the list of best times
+    PersonalBestsForSequence = PersonalBestManager->GetBestTimesForSequence(CurrentSequenceName);
+
     ClearAllBots();
     bIsSequenceActive = false;
     bIsTimerActive = false;
@@ -107,31 +119,6 @@ void SequenceManager::EndSequence(bool bCompleted)
     CurrentSequenceName = "";
     CurrentSequenceStep = 0;
     Timer.StopTimer();
-
-    if(bCompleted)
-    {
-        bSuccessfullyCompleted = true;
-        TimeCompleted = steady_clock::now();
-    }
-
-    /*
-        
-        Handle personal bests here if player completed the whole sequence
-    
-        - Open the personal.bests file
-        - Check if the current sequence's name is listed there
-            - If not, add the current run to the list and close file
-            - If it is, compare current run to run in file
-                - If nothing improved, close file
-                - If there was improvement, overwrite the listing in the file with the current run, then close the file
-
-        DATA FOR PERSONAL BESTS - sorted by priority
-        - Time
-        - Locations missed/skipped
-            - Maybe add a 3 second penalty for each pad skipped so that it sorts the time better
-    
-    
-    */
 }
 
 void SequenceManager::ResetAllCheckpoints()
@@ -146,69 +133,29 @@ void SequenceManager::ResetAllCheckpoints()
 void SequenceManager::ClearAllBots()
 {
     #ifndef NO_DEMO_CAR
-    /*
-    
-        IF ADDED TO THE SDK:
-
-        ArrayWrapper<ControllerWrapper> Players = Server.GetPlayers();
-        bool bClearedBots = false;
-        while(!bClearedBots)
-        {
-            bClearedBots = true;
-            for(int i = 0; i < Players.Count(); ++i)
-            {
-                if(ControllerWrapper ThisPlayer = PlayersGet(i))
-                {
-                    PlayerReplicationInfoWrapper PRI = ThisPlayer.GetPlayerReplicationInfo();
-                    if(!PRI.IsNull() && PRI.GetbBot())
-                    {
-                        bClearedBots = false;
-                        Server.RemovePlayer(ThisPlayer);
-                    }
-                }
-            }
-        }
-    
-    */
-
+    //Find all the bot controllers
     ServerWrapper Server = GetCurrentGameState();
     if(Server.IsNull()) { return; }
-    PlayerControllerWrapper PCW = gameWrapper->GetPlayerController();
-    if(PCW.IsNull()) { return; }
-    PriWrapper MyPRI = PCW.GetPRI();
-    if(MyPRI.IsNull()) { return; }
-
-    ArrayWrapper<PriWrapper> PRIs = Server.GetPRIs();
-    for(int i = 0; i < PRIs.Count(); ++i)
+    std::vector<ControllerWrapper> BotsToRemove;
+    ArrayWrapper<ControllerWrapper> Players = Server.GetPlayers();
+    for(int i = 0; i < Players.Count(); ++i)
     {
-        PriWrapper ThisPRI = PRIs.Get(i);
-        if(!ThisPRI.IsNull() && ThisPRI.memory_address != MyPRI.memory_address)
+        ControllerWrapper ThisPlayer = Players.Get(i);
+        if(!ThisPlayer.IsNull())
         {
-            cvarManagerGlobal->log("Removing car: " + std::to_string(i));
-            CarWrapper ThisCar = ThisPRI.GetCar();
-            if(!ThisCar.IsNull())
+            PlayerReplicationInfoWrapper PRI = ThisPlayer.GetPlayerReplicationInfo();
+            if(!PRI.IsNull() && PRI.GetbBot())
             {
-                Server.RemoveCar(ThisCar);
-                ThisCar.Destroy();
+                BotsToRemove.push_back(ThisPlayer);
             }
-            Server.RemovePRI(ThisPRI);
-            Server.HandlePlayerRemoved(Server, ThisPRI);
         }
     }
 
-    //CarWrapper LocalCar = gameWrapper->GetLocalCar();
-    //if(LocalCar.IsNull()) { return; }
-    //ArrayWrapper<CarWrapper> Cars = Server.GetCars();
-    //for(int i = 0; i < Cars.Count(); ++i)
-    //{
-    //    CarWrapper Car = Cars.Get(i);
-    //    if(Car.IsNull()) { continue; }
-    //    if(Car.memory_address != LocalCar.memory_address)
-    //    {
-    //        Server.RemoveCar(Car);
-    //        Car.Destroy();
-    //    }
-    //}
+    //Remove all the bot controllers
+    for(auto& Bot : BotsToRemove)
+    {
+        Server.RemovePlayer(Bot);
+    }
     #endif
 }
 
@@ -237,14 +184,6 @@ void SequenceManager::TryNextSubsequence(bool bEndCurrentSequence)
             {
                 StartSequence(CurrentMainSequenceName, false);
             }
-            else
-            {
-                Disable();
-            }
-        }
-        else
-        {
-            Disable();
         }
     }
 }
@@ -480,6 +419,25 @@ void SequenceManager::RenderHUD(CanvasWrapper Canvas)
     //Draw the clock
     Timer.DrawTimer(Canvas);
 
+    //Draw best times
+    if(bShowBestTimes)
+    {
+        static const Vector2F MaxTimeSize = Canvas.GetStringSize("00:00:00 Skipped:100", 2, 2);
+        Vector2 TextBase = {Canvas.GetSize().X - static_cast<int>(MaxTimeSize.X) - 30, 250};
+        Canvas.SetColor(LinearColor{255,255,255,255});
+
+        Canvas.SetPosition(TextBase);
+        Canvas.DrawString("BEST TIMES", 3, 3, true);
+        TextBase.Y += 50;
+
+        for(const auto& BestTime : PersonalBestsForSequence)
+        {
+            Canvas.SetPosition(TextBase);
+            Canvas.DrawString(BestTime.PrintPersonalBest(), 2, 2, true);
+            TextBase.Y += 30;
+        }
+    }
+
     //Draw the completed text below the clock
     if(bSuccessfullyCompleted)
     {
@@ -501,24 +459,27 @@ void SequenceManager::RenderHUD(CanvasWrapper Canvas)
     //Draw active sequence HUD
     if(CurrentSequence)
     {
-        //Draw the sequence title
-        Vector2 TextBase = {30, 250};
-        Canvas.SetColor(LinearColor{255,255,255,255});
-        Canvas.SetPosition(TextBase);
-        Canvas.DrawString(CurrentSequence->Name, 3, 3, true);
-        TextBase.Y += 50;
-
-        //Draw the sequence names in their respective colors
-        int CheckpointNamesSize = static_cast<int>(CheckpointNames.size());
-        for(int i = CheckpointNamesSize - 1; i >= 0; --i)
+        if(bShowCheckpointNames)
         {
-            float ColorPerc = static_cast<float>(i) / (CheckpointNames.size() - 1);
-            float ColorOpacity = (i == CheckpointNamesSize - 1) ? 1.f : 0.5f;
-            Canvas.SetColor(RT::GetPercentageColor(ColorPerc, ColorOpacity));
-
+            //Draw the sequence title
+            Vector2 TextBase = {30, 250};
+            Canvas.SetColor(LinearColor{255,255,255,255});
             Canvas.SetPosition(TextBase);
-            Canvas.DrawString(CheckpointNames[i], 2, 2, true);
-            TextBase.Y += 30;
+            Canvas.DrawString(CurrentSequence->Name, 3, 3, true);
+            TextBase.Y += 50;
+
+            //Draw the sequence names in their respective colors
+            int CheckpointNamesSize = static_cast<int>(CheckpointNames.size());
+            for(int i = CheckpointNamesSize - 1; i >= 0; --i)
+            {
+                float ColorPerc = static_cast<float>(i) / (CheckpointNames.size() - 1);
+                float ColorOpacity = (i == CheckpointNamesSize - 1) ? 1.f : 0.5f;
+                Canvas.SetColor(RT::GetPercentageColor(ColorPerc, ColorOpacity));
+
+                Canvas.SetPosition(TextBase);
+                Canvas.DrawString(CheckpointNames[i], 2, 2, true);
+                TextBase.Y += 30;
+            }
         }
     }
 }

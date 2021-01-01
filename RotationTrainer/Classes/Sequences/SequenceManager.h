@@ -1,15 +1,17 @@
 #pragma once
+#include "bakkesmod/plugin/bakkesmodplugin.h"
+#include "PersonalBests/PersonalBestsClasses.h"
+#include "SequenceTimer.h"
 #include <memory>
 #include <string>
 #include <filesystem>
 #include <vector>
 #include <chrono>
-#include "bakkesmod/plugin/bakkesmodplugin.h"
-#include "SequenceTimer.h"
 
 class SequenceContainer;
 class Sequence;
 class IndividualSequence;
+class PersonalBestsManager;
 
 class SequenceManager
 {
@@ -28,6 +30,9 @@ public:
     bool IsSequenceActive() { return bIsSequenceActive; }
     void SetNextSequenceDelay(float InDelay) { NextSequenceDelay = InDelay; }
 
+    void SetShowCheckpointNames(bool bNewValue) { bShowCheckpointNames = bNewValue; }
+    void SetShowBestTimes(bool bNewValue) { bShowBestTimes = bNewValue; }
+
     //Rendering and collision
     void TickSequence(CanvasWrapper Canvas, ServerWrapper Server);
     void SetNumCheckpointsToDisplay(int NewNumCheckpoints) { NumCheckpointsToDisplay = NewNumCheckpoints; }
@@ -44,6 +49,8 @@ private:
     std::shared_ptr<SequenceContainer> SequenceData;
     std::shared_ptr<Sequence> CurrentMainSequence;
     std::shared_ptr<IndividualSequence> CurrentSequence;
+    std::shared_ptr<PersonalBestsManager> PersonalBestManager;
+    std::vector<PersonalBest> PersonalBestsForSequence;
     std::string CurrentMainSequenceName;
     std::string CurrentSequenceName;
 
@@ -53,6 +60,8 @@ private:
     bool bIsSequenceActive = false;
     bool bIsTimerActive = false;
     bool bPendingNextSubsequence = false;
+    bool bShowCheckpointNames = true;
+    bool bShowBestTimes = false;
     int CurrentSequenceStep = 0;
     int SkippedSteps = 0;
     int CurrentNestedSequenceStep = 0;

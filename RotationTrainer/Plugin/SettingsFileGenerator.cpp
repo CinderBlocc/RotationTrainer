@@ -14,6 +14,10 @@ void RotationTrainer::GenerateSettingsFile()
 
     nl("Rotation Trainer");
     nl("1|Enable plugin|" + cv(CVAR_ENABLED));
+    nl("7|");
+    nl("1|Show checkpoint names|" + cv(CVAR_SHOW_CHECKPOINT_NAMES));
+    nl("7|");
+    nl("1|Show best times|" + cv(CVAR_SHOW_BEST_TIMES));
     blank;
     blank;
     nl("8|");

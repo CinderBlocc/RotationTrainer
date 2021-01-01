@@ -7,20 +7,8 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 /*
     TO-DO
 
+    - Create a good _Example.cfg and _ExampleNested.cfg with clear instructions
 
-    - ADD PERSONAL BEST LIST    ***SequenceManager.cpp, EndSequence***
-        - Store (in a single file) a list of the local player's current bests for any sequence they've completed
-        - Give it a .bests extension lul, it'll deter people from editing it themselves, and the file will be named personal.bests
-        - Store the top 5 times for each sequence?
-            - Sort by time, but show how many checkpoints were skipped next to the time
-        - Read the file and store ALL times in a data struct so you can sort the new time in easily
-            - Then completely overwrite the file
-
-
-    - DemoCar needs to have its bot removed when it is demolished
-        - Hook demo event to get car
-        - Get PRI from car (determine if bot and get name)
-            - If is bot and name contains DEMOCAR_BASE_NAME, RemovePlayer(car.GetAIController())
 */
 
 //Used for logging in any file that #includes MacrosStructsEnums (where this is extern declared)
@@ -31,29 +19,38 @@ void RotationTrainer::onLoad()
 {
     cvarManagerGlobal = cvarManager;
 
+    using namespace std::placeholders;
+
     //Create SequencesManager and load all the files in the default directory
     SequencesManager = std::make_shared<SequenceManager>(gameWrapper);
     SequencesManager->LoadSequencesInFolder(DEFAULT_CONFIG_DIRECTORY);
 
     bEnabled = std::make_shared<bool>(false);
+    bShowCheckpointNames = std::make_shared<bool>(false);
+    bShowBestTimes = std::make_shared<bool>(false);
     SequenceName = std::make_shared<std::string>("");
     NextSequenceDelay = std::make_shared<float>(0.f);
     cvarManager->registerCvar(CVAR_ENABLED, "1", "Enables rendering of checkpoints in rotation training plugin", true, true, 0, true, 1).bindTo(bEnabled);
+    cvarManager->registerCvar(CVAR_SHOW_CHECKPOINT_NAMES, "1", "Displays the list of upcoming checkpoints", true, true, 0, true, 1).bindTo(bShowCheckpointNames);
+    cvarManager->registerCvar(CVAR_SHOW_BEST_TIMES, "0", "Displays the list of best times for the current sequence", true, true, 0, true, 1).bindTo(bShowBestTimes);
     cvarManager->registerCvar(CVAR_SEQUENCE_NAME, "_Example", "Choose which sequence file to read", true).bindTo(SequenceName);
     cvarManager->registerCvar(CVAR_NEXT_SEQUENCE_DELAY, "3", "Delay between subsequences", true, true, 0, true, 120).bindTo(NextSequenceDelay);
     cvarManager->getCvar(CVAR_NEXT_SEQUENCE_DELAY).addOnValueChanged(std::bind(&RotationTrainer::OnDelayChanged, this));
+    cvarManager->getCvar(CVAR_SHOW_CHECKPOINT_NAMES).addOnValueChanged(std::bind(&RotationTrainer::OnShowCheckpointsChanged, this));
+    cvarManager->getCvar(CVAR_SHOW_BEST_TIMES).addOnValueChanged(std::bind(&RotationTrainer::OnShowBestTimesChanged, this));
 
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_LOADALL,   [this](std::vector<std::string> params){ReloadSequenceFiles();}, "Load all sequences", PERMISSION_ALL);
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_START,     [this](std::vector<std::string> params){StartSequence();}, std::string("Start sequence chosen in") + CVAR_SEQUENCE_NAME, PERMISSION_ALL);
     cvarManager->registerNotifier(NOTIFIER_SEQUENCE_END,       [this](std::vector<std::string> params){TerminateSequence();}, "End current sequence", PERMISSION_ALL);
-    cvarManager->registerNotifier(NOTIFIER_SEQUENCE_PREVIOUS,  [this](std::vector<std::string> params){/*PreviousOrNextSequence(true);*/}, "Start previous sequence", PERMISSION_ALL);
-    cvarManager->registerNotifier(NOTIFIER_SEQUENCE_NEXT,      [this](std::vector<std::string> params){/*PreviousOrNextSequence(false);*/}, "Start next sequence", PERMISSION_ALL);
-    cvarManager->registerNotifier(NOTIFIER_GET_START_INFO,     [this](std::vector<std::string> params){GetStartPointInfo();}, "Log current car info to console to use for starting point", PERMISSION_ALL);
-
+  //cvarManager->registerNotifier(NOTIFIER_SEQUENCE_PREVIOUS,  [this](std::vector<std::string> params){/*PreviousOrNextSequence(true);*/}, "Start previous sequence", PERMISSION_ALL);
+  //cvarManager->registerNotifier(NOTIFIER_SEQUENCE_NEXT,      [this](std::vector<std::string> params){/*PreviousOrNextSequence(false);*/}, "Start next sequence", PERMISSION_ALL);
+    cvarManager->registerNotifier(NOTIFIER_GET_START_INFO,     [this](std::vector<std::string> params){GetStartPointInfo();}, "Log current car info to console to use for starting point", PERMISSION_ALL);    
+    
     gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", std::bind(&RotationTrainer::OnGoalScored, this));
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.StartNewRound", std::bind(&RotationTrainer::OnNextRoundStarted, this));
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.Destroyed", std::bind(&RotationTrainer::TerminateSequence, this));
     gameWrapper->HookEventPost("Function TAGame.GameInfo_TA.PlayerResetTraining", std::bind(&RotationTrainer::RestartSequence, this));
+    gameWrapper->HookEventWithCallerPost<CarWrapper>("Function TAGame.Car_TA.Demolish", std::bind(&RotationTrainer::OnCarDemolished, this, _1, _2, _3));
 
     gameWrapper->RegisterDrawable(std::bind(&RotationTrainer::Tick, this, std::placeholders::_1));
 
@@ -117,6 +114,16 @@ void RotationTrainer::ReloadSequenceFiles()
     GenerateSettingsFile();
 }
 
+void RotationTrainer::OnShowCheckpointsChanged()
+{
+    SequencesManager->SetShowCheckpointNames(cvarManager->getCvar(CVAR_SHOW_CHECKPOINT_NAMES).getBoolValue());
+}
+
+void RotationTrainer::OnShowBestTimesChanged()
+{
+    SequencesManager->SetShowBestTimes(cvarManager->getCvar(CVAR_SHOW_BEST_TIMES).getBoolValue());
+}
+
 void RotationTrainer::OnDelayChanged()
 {
     //This only works for sequences that end with a checkpoint and not with the ball
@@ -145,6 +152,33 @@ void RotationTrainer::OnNextRoundStarted()
             bPendingNextSubsequence = false;
         }
     }, 0.001f);
+}
+
+void RotationTrainer::OnCarDemolished(CarWrapper Car, void* params, std::string funcName)
+{
+    #ifndef NO_DEMO_CAR
+
+    if(!IsValidMode())
+    {
+        return;
+    }
+
+    //Determine if the car is a bot
+    if(Car.IsNull()) { return; }
+    PriWrapper PRI = Car.GetPRI();
+    if(PRI.IsNull()) { return; }
+    if(PRI.GetbBot())
+    {
+        //Remove the bot from the lobby so it doesn't respawn
+        AIControllerWrapper AIController = Car.GetAIController();
+        if(AIController.IsNull()) { return; }
+        ServerWrapper Server = GetCurrentGameState();
+        if(Server.IsNull()) { return; }
+
+        Server.RemovePlayer(AIController);
+    }
+
+    #endif
 }
 
 

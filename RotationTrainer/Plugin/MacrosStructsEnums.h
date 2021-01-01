@@ -11,7 +11,7 @@
 //Temporary definition to block broken DemoCar functionality.
 //Current issue: once a bot is spawned, it can't be removed.
 //Might be fixed in a future SDK update that would add RemovePlayer function to ServerWrapper.
-#define NO_DEMO_CAR
+//#define NO_DEMO_CAR
 
 
 
@@ -22,6 +22,8 @@ extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 
 // MACROS //
 #define CVAR_ENABLED               "Rotation_Enabled"
+#define CVAR_SHOW_CHECKPOINT_NAMES "Rotation_ShowCheckpointNames"
+#define CVAR_SHOW_BEST_TIMES       "Rotation_ShowBestTimes"
 #define CVAR_SEQUENCE_NAME         "Rotation_SequenceName"
 #define CVAR_NEXT_SEQUENCE_DELAY   "Rotation_NextSequenceDelay"
 #define NOTIFIER_SEQUENCE_LOADALL  "Rotation_LoadAllSequences"
@@ -30,7 +32,9 @@ extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
 #define NOTIFIER_SEQUENCE_PREVIOUS "Rotation_PreviousSequence"
 #define NOTIFIER_SEQUENCE_NEXT     "Rotation_NextSequence"
 #define NOTIFIER_GET_START_INFO    "Rotation_GetStartPointInfo"
-#define DEFAULT_CONFIG_DIRECTORY   gameWrapper->GetDataFolder() / "RotationTrainer" / "Sequences"
+#define PERSONAL_BESTS_NAME        "Personal.Bests"
+#define DEFAULT_BESTS_DIRECTORY    gameWrapper->GetDataFolder() / "RotationTrainer"
+#define DEFAULT_CONFIG_DIRECTORY   DEFAULT_BESTS_DIRECTORY / "Sequences"
 #define DEMOCAR_BASE_NAME          "Demo Car"
 
 
