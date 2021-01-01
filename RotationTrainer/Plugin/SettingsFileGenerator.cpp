@@ -13,6 +13,7 @@ void RotationTrainer::GenerateSettingsFile()
     std::ofstream setFile(gameWrapper->GetBakkesModPath() / "plugins" / "settings" / "RotationTrainer.set");
 
     nl("Rotation Trainer");
+    nl("9|To get the full experience, please disable unlimited boost in freeplay");
     nl("1|Enable plugin|" + cv(CVAR_ENABLED));
     nl("7|");
     nl("1|Show checkpoint names|" + cv(CVAR_SHOW_CHECKPOINT_NAMES));

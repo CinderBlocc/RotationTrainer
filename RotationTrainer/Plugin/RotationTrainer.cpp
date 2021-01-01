@@ -7,11 +7,7 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 /*
     TO-DO
 
-    - Create a good _Example.cfg and _ExampleNested.cfg with clear instructions
-
     - Remove all NO_DEMO_CAR ifdefs
-
-    - If a DemoCar is skipped, it will release its hold on the car and not demo it
 
 */
 

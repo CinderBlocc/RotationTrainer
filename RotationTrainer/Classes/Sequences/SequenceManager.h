@@ -1,6 +1,7 @@
 #pragma once
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "PersonalBests/PersonalBestsClasses.h"
+#include "MacrosStructsEnums.h"
 #include "SequenceTimer.h"
 #include <memory>
 #include <string>
@@ -55,6 +56,7 @@ private:
     std::string CurrentSequenceName;
 
     SequenceTimer Timer;
+    CarLocations CarLine;
 
     bool bEnabled = false;
     bool bIsSequenceActive = false;
@@ -65,7 +67,7 @@ private:
     int CurrentSequenceStep = 0;
     int SkippedSteps = 0;
     int CurrentNestedSequenceStep = 0;
-    int NumCheckpointsToDisplay = 5;
+    int NumCheckpointsToDisplay = 4;
     float NextSequenceDelay = 3.f;
 
     bool bSuccessfullyCompleted = false;

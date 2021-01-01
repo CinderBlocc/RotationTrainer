@@ -1,6 +1,5 @@
 #include "SequenceManager.h"
 #include "SequenceContainer.h"
-#include "MacrosStructsEnums.h"
 #include "Sequence.h"
 #include "NestedSequence.h"
 #include "IndividualSequence.h"
@@ -84,6 +83,8 @@ void SequenceManager::StartCurrentSequence()
         {
             Car.SetVelocity(Vector(0, 0, 0));
             Car.SetLocation(Properties.StartPosition);
+            CarLine.LastLocation = Properties.StartPosition;
+            CarLine.CurrentLocation = Properties.StartPosition;
         }
 
         if(Properties.bSetStartRotation)
@@ -290,7 +291,6 @@ void SequenceManager::CheckCollisions(ServerWrapper Server)
     if(PRI.IsNull()) return;
 
     //Since this is used for the current tick and the last tick, use a static variable
-    static CarLocations CarLine;
     CarLine.PlayerID = PRI.GetUniqueIdWrapper();
     CarLine.LastLocation = CarLine.CurrentLocation;
     CarLine.CurrentLocation = LocalCar.GetLocation();

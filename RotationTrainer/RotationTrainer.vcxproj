@@ -41,7 +41,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(BAKKESMODSDK)include;F:\_YouTube\04_Extra_Assets\Game_Extensions_for_Production\_UP-TO-DATE-HELPER-FILES\RenderingTools;$(ProjectDir)Classes;$(ProjectDir)Plugin</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BAKKESMODSDK)include;$(SolutionDir)RenderingTools;$(ProjectDir)Classes;$(ProjectDir)Plugin</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -57,23 +57,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.cpp" />
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.cpp" />
+    <ClCompile Include="..\RenderingTools\Extra\CanvasExtensions.cpp" />
+    <ClCompile Include="..\RenderingTools\Extra\RenderingAssistant.cpp" />
+    <ClCompile Include="..\RenderingTools\Extra\RenderingMath.cpp" />
+    <ClCompile Include="..\RenderingTools\Extra\WrapperStructsExtensions.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Chevron.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Circle.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Circle2D.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Cone.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Cube.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Cylinder.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Frustum.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Grid.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Line.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Matrix3.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Plane.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Sphere.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\Triangle.cpp" />
+    <ClCompile Include="..\RenderingTools\Objects\VisualCamera.cpp" />
     <ClCompile Include="Classes\Checkpoints\BackboardCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\BallCheckpoint.cpp" />
     <ClCompile Include="Classes\Checkpoints\BoostCheckpoints.cpp" />
@@ -94,24 +95,25 @@
     <ClCompile Include="Plugin\SettingsFileGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\RenderingTools.h" />
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.h" />
+    <ClInclude Include="..\RenderingTools\Extra\CanvasExtensions.h" />
+    <ClInclude Include="..\RenderingTools\Extra\RenderingAssistant.h" />
+    <ClInclude Include="..\RenderingTools\Extra\RenderingMath.h" />
+    <ClInclude Include="..\RenderingTools\Extra\WrapperStructsExtensions.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Chevron.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Circle.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Circle2D.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Cone.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Cube.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Cylinder.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Frustum.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Grid.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Line.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Matrix3.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Plane.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Sphere.h" />
+    <ClInclude Include="..\RenderingTools\Objects\Triangle.h" />
+    <ClInclude Include="..\RenderingTools\Objects\VisualCamera.h" />
+    <ClInclude Include="..\RenderingTools\RenderingTools.h" />
     <ClInclude Include="Classes\Checkpoints\BackboardCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\BallCheckpoint.h" />
     <ClInclude Include="Classes\Checkpoints\BoostCheckpoints.h" />

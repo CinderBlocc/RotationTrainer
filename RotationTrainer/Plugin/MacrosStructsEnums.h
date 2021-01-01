@@ -129,5 +129,4 @@ struct CarLocations
 	Vector LastLocation;
 	Vector CurrentLocation;
 	UniqueIDWrapper PlayerID;
-	bool bHasNowAndLast = false; //don't check the current minus last location on the first tick that the object exists
 };

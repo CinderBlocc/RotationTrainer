@@ -36,57 +36,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.cpp">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.cpp">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.cpp">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.cpp">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.cpp">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClCompile>
     <ClCompile Include="Classes\Checkpoints\BackboardCheckpoint.cpp">
       <Filter>Classes\Checkpoints</Filter>
     </ClCompile>
@@ -141,62 +90,62 @@
     <ClCompile Include="Classes\PersonalBests\PersonalBestsClasses.cpp">
       <Filter>Classes\PersonalBests</Filter>
     </ClCompile>
+    <ClCompile Include="..\RenderingTools\Extra\CanvasExtensions.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Extra\RenderingAssistant.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Extra\RenderingMath.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Extra\WrapperStructsExtensions.cpp">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Chevron.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Circle.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Circle2D.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Cone.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Cube.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Cylinder.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Frustum.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Grid.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Line.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Matrix3.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Plane.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Sphere.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\Triangle.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RenderingTools\Objects\VisualCamera.cpp">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Chevron.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Circle.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cone.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cube.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Frustum.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Grid.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Line.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Matrix3.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Plane.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Sphere.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Triangle.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\VisualCamera.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Objects\Cylinder.h">
-      <Filter>Libraries\RenderingTools\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingAssistant.h">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\RenderingMath.h">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\WrapperStructsExtensions.h">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\Extra\CanvasExtensions.h">
-      <Filter>Libraries\RenderingTools\Extra</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\_UP-TO-DATE-HELPER-FILES\RenderingTools\RenderingTools.h">
-      <Filter>Libraries\RenderingTools</Filter>
-    </ClInclude>
     <ClInclude Include="Classes\Checkpoints\BackboardCheckpoint.h">
       <Filter>Classes\Checkpoints</Filter>
     </ClInclude>
@@ -253,6 +202,63 @@
     </ClInclude>
     <ClInclude Include="Classes\PersonalBests\PersonalBestsClasses.h">
       <Filter>Classes\PersonalBests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Extra\CanvasExtensions.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Extra\RenderingAssistant.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Extra\RenderingMath.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Extra\WrapperStructsExtensions.h">
+      <Filter>Libraries\RenderingTools\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Chevron.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Circle.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Circle2D.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Cone.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Cube.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Cylinder.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Frustum.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Grid.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Line.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Matrix3.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Plane.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Sphere.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\Triangle.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\Objects\VisualCamera.h">
+      <Filter>Libraries\RenderingTools\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RenderingTools\RenderingTools.h">
+      <Filter>Libraries\RenderingTools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

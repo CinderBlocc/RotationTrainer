@@ -30,7 +30,7 @@ void DemoCarCheckpoint::SpawnCar(ServerWrapper Server)
     //The +5 is for some additional tests in case a unique name can't be found within the number of existing cars
     for(int i = 0; i < Cars.Count() + 5; ++i)
     {
-        //"Demo Car 1"
+        //"Demo Car #"
         std::string TestName = BaseCarName + " " + std::to_string(i + 1);
         bool bIsUniqueName = true;
 
