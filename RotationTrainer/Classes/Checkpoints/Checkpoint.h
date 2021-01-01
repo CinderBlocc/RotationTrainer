@@ -23,9 +23,13 @@ public:
     std::string GetName() { return Name; }
     ELocationType GetLocationType() { return LocationType; }
 
+    bool GetSeen() { return bSeen; }
+    void SetSeen(bool bNewValue) { bSeen = bNewValue; }
+
 protected:
     ELocationType LocationType;
 	ELocation Location;
 	std::string Code;
 	std::string Name;
+    bool bSeen = false;
 };

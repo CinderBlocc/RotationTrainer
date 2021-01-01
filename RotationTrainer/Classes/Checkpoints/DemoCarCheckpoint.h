@@ -30,4 +30,6 @@ private:
     bool bIsCheckpointRevealed = false;
     std::string SpawnedCarName;
     std::string GetNameFromCar(CarWrapper Car);
+    void DemolishCar();
+    ServerWrapper GetCurrentGameState();
 };

@@ -53,11 +53,27 @@ void DemoCarCheckpoint::SpawnCar(ServerWrapper Server)
     }
 
     //23 is Octane
-    //Server.SpawnCar(23, FinalCarName);
     Server.SpawnBot(23, FinalCarName);
     SpawnedCarName = FinalCarName;
 
     bIsCheckpointRevealed = true;
+}
+
+void DemoCarCheckpoint::DemolishCar()
+{
+    ServerWrapper Server = GetCurrentGameState();
+    if(Server.IsNull()) { return; }
+
+    ArrayWrapper<CarWrapper> Cars = Server.GetCars();
+    for(int i = 0; i < Cars.Count(); ++i)
+    {
+        CarWrapper Car = Cars.Get(i);
+        if(GetNameFromCar(Car) == SpawnedCarName)
+        {
+            Car.Demolish2(gameWrapperGlobal->GetLocalCar());
+            return;
+        }
+    }
 }
 
 void DemoCarCheckpoint::SetSpawnedCarTransform(ServerWrapper Server)
@@ -75,6 +91,8 @@ void DemoCarCheckpoint::SetSpawnedCarTransform(ServerWrapper Server)
         {
             Car.SetLocation(LocationVec);
             Car.SetCarRotation(Rotation);
+            Car.SetVelocity(Vector(0,0,0));
+            Car.SetAngularVelocity(Vector(0,0,0), false);
             return;
         }
     }
@@ -98,6 +116,7 @@ std::string DemoCarCheckpoint::GetNameFromCar(CarWrapper Car)
 
 void DemoCarCheckpoint::ResetCheckpoint()
 {
+    DemolishCar();
     bIsCheckpointRevealed = false;
     SpawnedCarName = "";
 }
@@ -111,9 +130,20 @@ bool DemoCarCheckpoint::CheckCollision(CarWrapper InCar, CarLocations InCarLocat
 {
     if(LocationCheckpoint::CheckCollision(InCar, InCarLocations))
     {
+        DemolishCar();
         ResetCheckpoint();
         return true;
     }
 
     return false;
+}
+
+ServerWrapper DemoCarCheckpoint::GetCurrentGameState()
+{
+    if(gameWrapperGlobal->IsInReplay())
+        return gameWrapperGlobal->GetGameEventAsReplay().memory_address;
+    else if(gameWrapperGlobal->IsInOnlineGame())
+        return gameWrapperGlobal->GetOnlineGame();
+    else
+        return gameWrapperGlobal->GetGameEventAsServer();
 }

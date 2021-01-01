@@ -16,8 +16,8 @@
 
 
 
-//Useful for logging in any of the classes
 extern std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
+extern std::shared_ptr<GameWrapper> gameWrapperGlobal;
 
 
 // MACROS //

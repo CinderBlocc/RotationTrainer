@@ -11,15 +11,18 @@ BAKKESMOD_PLUGIN(RotationTrainer, "Rotation training plugin", "1.0", PLUGINTYPE_
 
     - Remove all NO_DEMO_CAR ifdefs
 
+    - If a DemoCar is skipped, it will release its hold on the car and not demo it
+
 */
 
-//Used for logging in any file that #includes MacrosStructsEnums (where this is extern declared)
 std::shared_ptr<CVarManagerWrapper> cvarManagerGlobal;
+std::shared_ptr<GameWrapper> gameWrapperGlobal;
 
 // PLUGIN BOILERPLATE //
 void RotationTrainer::onLoad()
 {
     cvarManagerGlobal = cvarManager;
+    gameWrapperGlobal = gameWrapper;
 
     using namespace std::placeholders;
 
@@ -52,7 +55,8 @@ void RotationTrainer::onLoad()
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.StartNewRound", std::bind(&RotationTrainer::OnNextRoundStarted, this));
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.Destroyed", std::bind(&RotationTrainer::TerminateSequence, this));
     gameWrapper->HookEventPost("Function TAGame.GameInfo_TA.PlayerResetTraining", std::bind(&RotationTrainer::RestartSequence, this));
-    gameWrapper->HookEventWithCallerPost<CarWrapper>("Function TAGame.Car_TA.Demolish", std::bind(&RotationTrainer::OnCarDemolished, this, _1, _2, _3));
+    gameWrapper->HookEventWithCallerPost<CarWrapper>("Function TAGame.Car_TA.EventDemolished", std::bind(&RotationTrainer::OnCarDemolished, this, _1, _2, _3));
+    //gameWrapper->HookEventWithCallerPost<CarWrapper>("Function TAGame.Car_TA.Demolish", std::bind(&RotationTrainer::OnCarDemolished, this, _1, _2, _3));
 
     gameWrapper->RegisterDrawable(std::bind(&RotationTrainer::Tick, this, std::placeholders::_1));
 

@@ -382,6 +382,16 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
     if(Camera.IsNull()) return;
     RT::Frustum Frustum(Canvas, Camera);
 
+    //Loop through every checkpoint in the sequence and set them all to "unseen"
+    //This is for auto-demolishing the DemoCars if they were skipped
+    for(int i = 0; i < static_cast<int>(CurrentSequence->GetSequenceSize()); ++i)
+    {
+        if(auto ThisCheckpoint = CurrentSequence->GetCheckpoint(i))
+        {
+            ThisCheckpoint->SetSeen(false);
+        }
+    }
+
     //Need to draw from the back to the front.
     //If drawing from front to back, and if the next point and another later point are the same,
     //the later point would draw on top of the next point
@@ -391,12 +401,33 @@ void SequenceManager::RenderCheckpoints(CanvasWrapper Canvas)
         {
             if(auto ThisCheckpoint = CurrentSequence->GetCheckpoint(CurrentSequenceStep + i))
             {
+                ThisCheckpoint->SetSeen(true);
+
                 float ColorPerc = static_cast<float>(i) / (NumCheckpointsToDisplay - 1);
                 float ColorOpacity = (i == 0) ? 1.f : 0.33f;
                 Canvas.SetColor(RT::GetPercentageColor(1 - ColorPerc, ColorOpacity));
                 
                 ThisCheckpoint->Draw(Canvas, Camera, Frustum, AnimTime);
                 CheckpointNames.push_back(ThisCheckpoint->GetName());
+            }
+        }
+    }
+
+    //Loop through every checkpoint in the sequence and terminate them if they weren't seen
+    //Really only useful for DemoCars so they can blow up the car if the checkpoint was skipped
+    for(int i = 0; i < static_cast<int>(CurrentSequence->GetSequenceSize()); ++i)
+    {
+        auto ThisCheckpoint = CurrentSequence->GetCheckpoint(i);
+        if(ThisCheckpoint && !ThisCheckpoint->GetSeen())
+        {
+            //Only reset the checkpoint on a DemoCar if it was previously seen
+            if(ThisCheckpoint->GetLocationType() == ELocationType::LT_DEMO_CAR)
+            {
+                auto ThisDemoCar = std::static_pointer_cast<DemoCarCheckpoint>(ThisCheckpoint);
+                if(ThisDemoCar->IsCheckpointRevealed())
+                {
+                    ThisCheckpoint->ResetCheckpoint();
+                }
             }
         }
     }
