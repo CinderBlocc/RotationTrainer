@@ -2,7 +2,7 @@
 #include "RenderingTools.h"
 
 DemoCarCheckpoint::DemoCarCheckpoint(std::string InName, Vector InLocation, Rotator InRotation)
-    : LocationCheckpoint(InName, InLocation, 150), Rotation(InRotation)
+    : LocationCheckpoint(InName, InLocation, 180), Rotation(InRotation)
 {
     LocationType = ELocationType::LT_DEMO_CAR;
     bDrawCircle = false;
